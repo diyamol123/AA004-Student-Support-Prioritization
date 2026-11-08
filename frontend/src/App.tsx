@@ -36,14 +36,31 @@ type Recommendation = {
   agent_output_refs: string[]
 }
 
+type ValidatedCase = {
+  case_id: string
+  attendance_rate: number | null
+  missed_submissions: number | null
+  engagement_status: string | null
+  days_since_last_activity: number | null
+  unresolved_support_tickets: number | null
+  recent_activity_indicators: string[]
+  missing_fields: string[]
+}
+
 type WorkflowResult = {
   workflow_id: string
-  student_case?: CaseInput
+  student_case: CaseInput
+  validated_case?: ValidatedCase | null
+  attendance_flag: string | null
+  engagement_flag: string | null
+  support_load_flag: string | null
+  scores: Record<string, number>
   agent_outputs: AgentOutput[]
-  final_recommendation: Recommendation
+  final_recommendation: Recommendation | null
   explanation: string | string[]
-  audit_reference: string
+  audit_reference: string | null
   errors: string[]
+  created_at: string
 }
 
 const initialCase: CaseInput = {
@@ -207,7 +224,7 @@ function App() {
           <div className="status-dot" />
           <div>
             <strong>Deterministic MVP</strong>
-            <span>Phase 1.1 · Local environment</span>
+            <span>Phase 1.2 · Local environment</span>
           </div>
         </div>
       </aside>
@@ -435,6 +452,100 @@ function App() {
           </section>
         </div>
 
+        {result && (
+          <section className="panel context-panel">
+            <div className="panel-heading">
+              <div>
+                <span className="section-kicker">WORKFLOW STATE / CONTEXT</span>
+                <h2>Run-scoped shared workflow context</h2>
+                <p>
+                  Structured state for this workflow execution only. It is not
+                  permanent or long-term memory.
+                </p>
+              </div>
+              <span className="count-tag">CURRENT RUN</span>
+            </div>
+
+            <div className="context-grid">
+              <div className="context-card">
+                <h3>Business input</h3>
+                <p className="muted">Original case submitted to the workflow.</p>
+                <pre className="context-json">
+                  {JSON.stringify(result.student_case, null, 2)}
+                </pre>
+              </div>
+
+              <div className="context-card">
+                <h3>Validated case</h3>
+                <p className="muted">Normalized output from the Case Intake Agent.</p>
+                {result.validated_case ? (
+                  <>
+                    <pre className="context-json">
+                      {JSON.stringify(result.validated_case, null, 2)}
+                    </pre>
+                    <p>
+                      Missing fields:{" "}
+                      <strong>
+                        {result.validated_case.missing_fields.length
+                          ? result.validated_case.missing_fields.join(", ")
+                          : "None"}
+                      </strong>
+                    </p>
+                  </>
+                ) : (
+                  <p className="muted">No validated case was returned.</p>
+                )}
+              </div>
+
+              <div className="context-card">
+                <h3>Domain flags</h3>
+                <dl className="context-values">
+                  <div>
+                    <dt>Attendance flag</dt>
+                    <dd>{result.attendance_flag ?? "Not available"}</dd>
+                  </div>
+                  <div>
+                    <dt>Engagement flag</dt>
+                    <dd>{result.engagement_flag ?? "Not available"}</dd>
+                  </div>
+                  <div>
+                    <dt>Support load flag</dt>
+                    <dd>{result.support_load_flag ?? "Not available"}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div className="context-card">
+                <h3>Workflow scores</h3>
+                {Object.keys(result.scores ?? {}).length ? (
+                  <dl className="context-values">
+                    {Object.entries(result.scores).map(([name, score]) => (
+                      <div key={name}>
+                        <dt>{name.replaceAll("_", " ")}</dt>
+                        <dd>{score}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : (
+                  <p className="muted">No scores returned.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="context-meta">
+              <span>Workflow ID: <strong>{result.workflow_id}</strong></span>
+              <span>
+                Created:{" "}
+                <strong>
+                  {result.created_at
+                    ? new Date(result.created_at).toLocaleString()
+                    : "Not available"}
+                </strong>
+              </span>
+            </div>
+          </section>
+        )}
+
         {error && <div className="error-banner">Request error: {error}</div>}
 
         {result && (
@@ -463,6 +574,13 @@ function App() {
                     </summary>
                     <div className="agent-details">
                       <p>{agent.summary}</p>
+                      <div className="agent-responsibility">
+                        <strong>Responsibility</strong>
+                        <p>
+                          {agentDescriptions[agent.agent_name] ??
+                            "Processes its assigned workflow responsibility."}
+                        </p>
+                      </div>
                       <div className="agent-meta">
                         <span>Status: <strong>{agent.status}</strong></span>
                         <span>Score: <strong>{agent.score}</strong></span>
@@ -479,6 +597,16 @@ function App() {
                           ))}
                         </ul>
                       ) : <p className="muted">No evidence items returned.</p>}
+
+                      <h4>Structured agent output</h4>
+                      {agent.output_data &&
+                      Object.keys(agent.output_data).length > 0 ? (
+                        <pre className="agent-output-json">
+                          {JSON.stringify(agent.output_data, null, 2)}
+                        </pre>
+                      ) : (
+                        <p className="muted">No structured output data returned.</p>
+                      )}
                     </div>
                   </details>
                 ))}
@@ -502,6 +630,10 @@ function App() {
                 <span className="section-kicker">05 / AUDITABILITY</span>
                 <h2>Audit record</h2>
                 <p className="audit-reference">{result.audit_reference}</p>
+                <p className="audit-storage-note">
+                  MVP storage: audit records are held in backend memory and
+                  are not retained after a backend restart.
+                </p>
                 <button
                   className="secondary-button"
                   type="button"
@@ -518,13 +650,17 @@ function App() {
 
             <footer className="workflow-footer">
               <span>Workflow ID: {result.workflow_id}</span>
-              <span>{result.errors.length} workflow errors</span>
+              <span className="workflow-error-count">
+                {result.errors.length === 0
+                  ? 'No workflow errors'
+                  : `${result.errors.length} workflow errors`}
+              </span>
             </footer>
           </>
         )}
 
         <footer className="page-footer">
-          AA004 · Student Support Case Prioritization · Phase 1.1 MVP
+          AA004 · Student Support Case Prioritization · Phase 1.2 MVP
         </footer>
       </main>
     </div>
