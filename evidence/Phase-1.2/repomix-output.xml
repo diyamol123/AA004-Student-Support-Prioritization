@@ -77,8 +77,15 @@ docs/
   AA004_Implementation_Plan.md
   Product_Bible.md
 evidence/
+  Phase-1.2/
+    Screenshot 2026-11-08 at 09.32.50.png
+    Screenshot 2026-11-08 at 09.33.19.png
+    Screenshot 2026-11-08 at 09.33.35.png
+    Screenshot 2026-11-08 at 09.33.49.png
+    Screenshot 2026-11-08 at 09.33.59.png
   01-Dashboard.png
   02-Successful-Workflow.png
+  03-Audit-Evidence.png
 frontend/
   public/
     favicon.svg
@@ -2440,7 +2447,7 @@ Do not force every project to display identical domain content.
 <file path="docs/AA004_Implementation_Plan.md">
 # AA004 — Implementation Plan
 ## Student Support Case Prioritization
-## Phase 1.1 — Deterministic Agentic AI MVP
+## Phase 1.2 — Workflow Visualization & Evidence
 
 ## 1. Source of Truth
 
@@ -2499,7 +2506,7 @@ Audit Trail
     ↓
 Business UI
 
-Agents execute sequentially in Phase 1.1.
+Agents execute sequentially in the Phase 1.2 workflow.
 
 ## 4. Required Agents
 
@@ -3003,6 +3010,433 @@ When this Product Bible is given to an AI assistant together with a RealRails Gi
 
 <file path="frontend/src/assets/vite.svg">
 <svg xmlns="http://www.w3.org/2000/svg" width="77" height="47" fill="none" aria-labelledby="vite-logo-title" viewBox="0 0 77 47"><title id="vite-logo-title">Vite</title><style>.parenthesis{fill:#000}@media (prefers-color-scheme:dark){.parenthesis{fill:#fff}}</style><path fill="#9135ff" d="M40.151 45.71c-.663.844-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.493c-.92 0-1.457-1.04-.92-1.788l7.479-10.471c1.07-1.498 0-3.578-1.842-3.578H15.443c-.92 0-1.456-1.04-.92-1.788l9.696-13.576c.213-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.472c-1.07 1.497 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.087.89 1.83L40.153 45.712z"/><mask id="a" width="48" height="47" x="14" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M40.047 45.71c-.663.843-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.389c-.92 0-1.457-1.04-.92-1.788l7.479-10.472c1.07-1.497 0-3.578-1.842-3.578H15.34c-.92 0-1.456-1.04-.92-1.788l9.696-13.575c.213-.297.556-.474.92-.474H53.93c.92 0 1.456 1.04.92 1.788L47.37 13.03c-1.07 1.498 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.088.89 1.831L40.049 45.712z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#eee6ff" rx="5.508" ry="14.704" transform="rotate(269.814 20.96 11.29)scale(-1 1)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#eee6ff" rx="10.399" ry="29.851" transform="rotate(89.814 -16.902 -8.275)scale(1 -1)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#8900ff" rx="5.508" ry="30.487" transform="rotate(89.814 -19.197 -7.127)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.928 4.177)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.738 5.52)scale(1 -1)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#eee6ff" rx="14.072" ry="22.078" transform="rotate(93.35 31.245 55.578)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx="14.592" cy="9.743" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(39.51 14.592 9.743)"/></g><g filter="url(#k)"><ellipse cx="61.728" cy="-5.321" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 61.728 -5.32)"/></g><g filter="url(#l)"><ellipse cx="55.618" cy="7.104" fill="#00c2ff" rx="5.971" ry="9.665" transform="rotate(37.892 55.618 7.104)"/></g><g filter="url(#m)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#n)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#o)"><ellipse cx="49.857" cy="30.678" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 49.857 30.678)"/></g><g filter="url(#p)"><ellipse cx="52.623" cy="33.171" fill="#00c2ff" rx="5.971" ry="15.297" transform="rotate(37.892 52.623 33.17)"/></g></g><path d="M6.919 0c-9.198 13.166-9.252 33.575 0 46.789h6.215c-9.25-13.214-9.196-33.623 0-46.789zm62.424 0h-6.215c9.198 13.166 9.252 33.575 0 46.789h6.215c9.25-13.214 9.196-33.623 0-46.789" class="parenthesis"/><defs><filter id="b" width="60.045" height="41.654" x="-5.564" y="16.92" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-40.407" y="-6.762" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-35.435" y="2.801" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-30.84" y="20.8" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-29.307" y="21.949" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="29.961" y="-17.13" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-13.43" y="-22.082" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="34.321" y="-37.644" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="38.847" y="-10.552" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="22.45" y="-1.645" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="32.919" y="11.36" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter></defs></svg>
+</file>
+
+<file path="frontend/src/index.css">
+:root {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #172033;
+  background: #f4f6fa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: .65; }
+</file>
+
+<file path="frontend/src/main.tsx">
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+</file>
+
+<file path="frontend/.gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path="frontend/eslint.config.js">
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      globals: globals.browser,
+    },
+  },
+])
+</file>
+
+<file path="frontend/index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AA004 | Student Support Prioritization</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="frontend/package.json">
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.6"
+  }
+}
+</file>
+
+<file path="frontend/tsconfig.app.json">
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "types": ["vite/client"],
+    "allowArbitraryExtensions": true,
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"]
+}
+</file>
+
+<file path="frontend/tsconfig.json">
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+</file>
+
+<file path="frontend/tsconfig.node.json">
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["vite.config.ts"]
+}
+</file>
+
+<file path="frontend/vite.config.ts">
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/health': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+    },
+  },
+})
+</file>
+
+<file path=".gitignore">
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+.DS_Store
+repomix-output.xml
+</file>
+
+<file path="README.md">
+# AA004 — Student Support Case Prioritization
+
+**RealRails Agentic AI Batch 2 | Phase 1.2 — Workflow Visualization & Evidence**
+
+## 1. Project Overview
+
+Student Support Case Prioritization is a deterministic, multi-agent workflow designed to help academic support teams prioritize student support cases for timely outreach.
+
+The system evaluates approved academic-support indicators, including:
+
+- Attendance rate
+- Missed submissions
+- Student engagement status
+- Days since last activity
+- Unresolved support tickets
+
+It generates an explainable recommendation, priority score, supporting evidence, and audit record.
+
+**Primary objective:** Support transparent and consistent academic-support outreach decisions.
+
+## 2. Business Problem
+
+Academic support teams receive multiple student support requests and need a consistent way to identify cases that may require additional attention.
+
+This MVP provides a structured prioritization workflow that helps coordinators identify cases for follow-up, priority outreach, tutor review, or additional information.
+
+## 3. Agent Architecture
+
+The application uses five specialized agents:
+
+1. **Case Intake Agent** — validates and normalizes incoming case information.
+2. **Attendance Agent** — evaluates attendance indicators.
+3. **Engagement Agent** — evaluates engagement and recent activity.
+4. **Support Load Agent** — evaluates missed submissions and unresolved support tickets.
+5. **Student Support Decision Agent** — combines agent outputs and deterministic rules to generate the final recommendation.
+
+Each agent has a defined responsibility and produces structured, traceable outputs.
+
+## 4. Recommendation Types
+
+The workflow supports four recommendations:
+
+| Recommendation | Meaning |
+|---|---|
+| `NORMAL_FOLLOWUP` | Routine support follow-up |
+| `PRIORITY_OUTREACH` | Priority academic-support outreach |
+| `TUTOR_REVIEW` | Human tutor or coordinator review |
+| `REQUEST_MORE_INFO` | Additional information is required |
+
+The system calculates a priority score and provides reasons, triggered rules, and evidence for its recommendation.
+
+## 5. Technology Stack
+
+**Backend**
+- Python 3.11+
+- FastAPI
+- Pydantic
+- Pytest
+
+**Frontend**
+- React
+- TypeScript
+- Vite
+- CSS
+
+**Workflow**
+- Deterministic agent execution
+- Shared workflow context
+- Rule-based prioritization
+- Audit logging
+
+## 6. Project Structure
+
+```text
+AA004-Student-Support-Prioritization/
+├── backend/
+│   ├── app/
+│   │   ├── agents/
+│   │   ├── models/
+│   │   └── services/
+│   ├── tests/
+│   └── main.py
+├── docs/
+│   ├── Product_Bible.md
+│   ├── 01_Product_Bible_Execution_Guide.md
+│   ├── 02_Deterministic_AgenticAI_Architecture_Guide.md
+│   ├── 03_AI_Assisted_Build_and_Repomix_Guide.md
+│   ├── 04_Workflow_Shared_Context_Explainability_Guide.md
+│   └── AA004_Implementation_Plan.md
+├── frontend/
+│   ├── src/
+│   └── package.json
+├── .gitignore
+└── README.md
+```
+
+## 7. Setup and Execution
+
+### Backend
+
+From the project root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+python3 -m uvicorn backend.main:app --reload --port 8000
+```
+
+Backend health endpoint:
+
+```text
+http://127.0.0.1:8000/health
+```
+
+### Frontend
+
+Open another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the Vite development URL printed in the terminal, usually:
+
+```text
+http://localhost:5173
+```
+
+### Production build
+
+```bash
+cd frontend
+npm run build
+npm run lint
+```
+
+## 8. API Endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/health` | Backend health check |
+| POST | `/api/workflows/run` | Execute prioritization workflow |
+| GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
+
+## 9. Validation Results
+
+Latest local validation:
+
+- Backend tests: **45 passed**
+- Frontend TypeScript compilation: passed
+- Vite production build: passed
+- Frontend ESLint: passed
+- Four demo scenarios tested successfully
+- Five-agent workflow execution verified
+- Audit record retrieval verified
+
+## 10. MVP Scope and Limitations
+
+This MVP is designed for academic-support prioritization only.
+
+It does not make grading, disciplinary, admission, or academic penalty decisions.
+
+It does not use protected or sensitive personal characteristics for prioritization.
+
+The scoring thresholds are initial MVP assumptions and should be reviewed and approved by the institution before operational use.
+
+Recommendations are intended to support human academic-support staff, not replace their judgment.
+
+## 11. Future Improvements
+
+Potential future enhancements include:
+
+- Configurable institutional prioritization thresholds
+- Expanded audit and reporting capabilities
+- Integration with approved student-support systems
+- Further workflow orchestration capabilities
+
+---
+
+**Case ID:** AA004
+**Product:** Student Support Case Prioritization
+**Domain:** Education Operations
+**Phase:** 1.1 — Deterministic Agentic AI MVP
 </file>
 
 <file path="frontend/src/App.css">
@@ -3989,433 +4423,6 @@ function App() {
 }
 
 export default App
-</file>
-
-<file path="frontend/src/index.css">
-:root {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #172033;
-  background: #f4f6fa;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-button, input, select { font: inherit; }
-button { cursor: pointer; }
-button:disabled { cursor: wait; opacity: .65; }
-</file>
-
-<file path="frontend/src/main.tsx">
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
-</file>
-
-<file path="frontend/.gitignore">
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-</file>
-
-<file path="frontend/eslint.config.js">
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
-    languageOptions: {
-      globals: globals.browser,
-    },
-  },
-])
-</file>
-
-<file path="frontend/index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AA004 | Student Support Prioritization</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-</file>
-
-<file path="frontend/package.json">
-{
-  "name": "frontend",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^24.19.2",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
-    "eslint": "^10.14.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
-    "globals": "^17.13.0",
-    "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.1",
-    "vite": "^8.3.6"
-  }
-}
-</file>
-
-<file path="frontend/tsconfig.app.json">
-{
-  "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "es2023",
-    "lib": ["ES2023", "DOM"],
-    "module": "esnext",
-    "types": ["vite/client"],
-    "allowArbitraryExtensions": true,
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src"]
-}
-</file>
-
-<file path="frontend/tsconfig.json">
-{
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
-}
-</file>
-
-<file path="frontend/tsconfig.node.json">
-{
-  "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "es2023",
-    "lib": ["ES2023"],
-    "types": ["node"],
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "module": "nodenext",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
-    /* Linting */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["vite.config.ts"]
-}
-</file>
-
-<file path="frontend/vite.config.ts">
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/health': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-    },
-  },
-})
-</file>
-
-<file path=".gitignore">
-.venv/
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.env
-.env.*
-!.env.example
-node_modules/
-dist/
-.DS_Store
-repomix-output.xml
-</file>
-
-<file path="README.md">
-# AA004 — Student Support Case Prioritization
-
-**RealRails Agentic AI Batch 2 | Phase 1.1 — Deterministic Agentic AI MVP**
-
-## 1. Project Overview
-
-Student Support Case Prioritization is a deterministic, multi-agent workflow designed to help academic support teams prioritize student support cases for timely outreach.
-
-The system evaluates approved academic-support indicators, including:
-
-- Attendance rate
-- Missed submissions
-- Student engagement status
-- Days since last activity
-- Unresolved support tickets
-
-It generates an explainable recommendation, priority score, supporting evidence, and audit record.
-
-**Primary objective:** Support transparent and consistent academic-support outreach decisions.
-
-## 2. Business Problem
-
-Academic support teams receive multiple student support requests and need a consistent way to identify cases that may require additional attention.
-
-This MVP provides a structured prioritization workflow that helps coordinators identify cases for follow-up, priority outreach, tutor review, or additional information.
-
-## 3. Agent Architecture
-
-The application uses five specialized agents:
-
-1. **Case Intake Agent** — validates and normalizes incoming case information.
-2. **Attendance Agent** — evaluates attendance indicators.
-3. **Engagement Agent** — evaluates engagement and recent activity.
-4. **Support Load Agent** — evaluates missed submissions and unresolved support tickets.
-5. **Student Support Decision Agent** — combines agent outputs and deterministic rules to generate the final recommendation.
-
-Each agent has a defined responsibility and produces structured, traceable outputs.
-
-## 4. Recommendation Types
-
-The workflow supports four recommendations:
-
-| Recommendation | Meaning |
-|---|---|
-| `NORMAL_FOLLOWUP` | Routine support follow-up |
-| `PRIORITY_OUTREACH` | Priority academic-support outreach |
-| `TUTOR_REVIEW` | Human tutor or coordinator review |
-| `REQUEST_MORE_INFO` | Additional information is required |
-
-The system calculates a priority score and provides reasons, triggered rules, and evidence for its recommendation.
-
-## 5. Technology Stack
-
-**Backend**
-- Python 3.11+
-- FastAPI
-- Pydantic
-- Pytest
-
-**Frontend**
-- React
-- TypeScript
-- Vite
-- CSS
-
-**Workflow**
-- Deterministic agent execution
-- Shared workflow context
-- Rule-based prioritization
-- Audit logging
-
-## 6. Project Structure
-
-```text
-AA004-Student-Support-Prioritization/
-├── backend/
-│   ├── app/
-│   │   ├── agents/
-│   │   ├── models/
-│   │   └── services/
-│   ├── tests/
-│   └── main.py
-├── docs/
-│   ├── Product_Bible.md
-│   ├── 01_Product_Bible_Execution_Guide.md
-│   ├── 02_Deterministic_AgenticAI_Architecture_Guide.md
-│   ├── 03_AI_Assisted_Build_and_Repomix_Guide.md
-│   ├── 04_Workflow_Shared_Context_Explainability_Guide.md
-│   └── AA004_Implementation_Plan.md
-├── frontend/
-│   ├── src/
-│   └── package.json
-├── .gitignore
-└── README.md
-```
-
-## 7. Setup and Execution
-
-### Backend
-
-From the project root:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements.txt
-python3 -m uvicorn backend.main:app --reload --port 8000
-```
-
-Backend health endpoint:
-
-```text
-http://127.0.0.1:8000/health
-```
-
-### Frontend
-
-Open another terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open the Vite development URL printed in the terminal, usually:
-
-```text
-http://localhost:5173
-```
-
-### Production build
-
-```bash
-cd frontend
-npm run build
-npm run lint
-```
-
-## 8. API Endpoints
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/health` | Backend health check |
-| POST | `/api/workflows/run` | Execute prioritization workflow |
-| GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
-
-## 9. Validation Results
-
-Latest local validation:
-
-- Backend tests: **45 passed**
-- Frontend TypeScript compilation: passed
-- Vite production build: passed
-- Frontend ESLint: passed
-- Four demo scenarios tested successfully
-- Five-agent workflow execution verified
-- Audit record retrieval verified
-
-## 10. MVP Scope and Limitations
-
-This MVP is designed for academic-support prioritization only.
-
-It does not make grading, disciplinary, admission, or academic penalty decisions.
-
-It does not use protected or sensitive personal characteristics for prioritization.
-
-The scoring thresholds are initial MVP assumptions and should be reviewed and approved by the institution before operational use.
-
-Recommendations are intended to support human academic-support staff, not replace their judgment.
-
-## 11. Future Improvements
-
-Potential future enhancements include:
-
-- Configurable institutional prioritization thresholds
-- Expanded audit and reporting capabilities
-- Integration with approved student-support systems
-- Further workflow orchestration capabilities
-
----
-
-**Case ID:** AA004
-**Product:** Student Support Case Prioritization
-**Domain:** Education Operations
-**Phase:** 1.1 — Deterministic Agentic AI MVP
 </file>
 
 </files>

@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 1.1 — Deterministic Agentic AI MVP**
+**RealRails Agentic AI Batch 2 | Phase 1.2 — Workflow Visualization & Evidence**
 
 ## 1. Project Overview
 

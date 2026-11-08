@@ -1,6 +1,6 @@
 # AA004 — Implementation Plan
 ## Student Support Case Prioritization
-## Phase 1.1 — Deterministic Agentic AI MVP
+## Phase 1.2 — Workflow Visualization & Evidence
 
 ## 1. Source of Truth
 
@@ -59,7 +59,7 @@ Audit Trail
     ↓
 Business UI
 
-Agents execute sequentially in Phase 1.1.
+Agents execute sequentially in the Phase 1.2 workflow.
 
 ## 4. Required Agents
 
