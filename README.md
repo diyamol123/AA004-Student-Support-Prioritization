@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 1.2 — Workflow Visualization & Evidence**
+**RealRails Agentic AI Batch 2 | Phase 1.3 — Dockerized Local Deployment & Validation**
 
 ## 1. Project Overview
 
@@ -137,7 +137,62 @@ npm run build
 npm run lint
 ```
 
-## 8. API Endpoints
+
+## 8. Dockerized Local Deployment
+
+The application can be built and run locally using Docker Compose.
+
+### Prerequisites
+
+- Docker Desktop installed and running
+- Docker Compose V2
+
+### Build the containers
+
+Run from the project root:
+
+    docker compose build
+
+### Start the application
+
+    docker compose up -d
+
+### Access the application
+
+- Frontend: http://localhost:8080
+- Backend health: http://localhost:8000/health
+- Frontend health proxy: http://localhost:8080/health
+- API documentation: http://localhost:8000/docs
+
+### Check container health
+
+    docker compose ps
+
+Both backend and frontend containers should report healthy status.
+
+### View application logs
+
+    docker compose logs
+
+For individual services:
+
+    docker compose logs backend
+    docker compose logs frontend
+
+### Stop the containers
+
+    docker compose down
+
+### Troubleshooting
+
+- If a port is already in use, stop the conflicting application or configure BACKEND_PORT and FRONTEND_PORT.
+- If the backend is not healthy, inspect it using docker compose logs backend.
+- If the frontend cannot reach the backend, check BACKEND_URL and backend container health.
+- Rebuild after changing application code or Docker configuration using docker compose up -d --build.
+
+The audit service currently uses in-memory storage. Audit records are available while the backend process is running and are not persisted across backend restarts.
+
+## 9. API Endpoints
 
 | Method | Endpoint | Purpose |
 |---|---|---|
@@ -145,7 +200,7 @@ npm run lint
 | POST | `/api/workflows/run` | Execute prioritization workflow |
 | GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
 
-## 9. Validation Results
+## 10. Validation Results
 
 Latest local validation:
 
@@ -156,8 +211,16 @@ Latest local validation:
 - Four demo scenarios tested successfully
 - Five-agent workflow execution verified
 - Audit record retrieval verified
+- Backend Docker image built successfully
+- Frontend Docker image built successfully
+- Backend and frontend containers started successfully
+- Both container health checks passed
+- Nginx reverse proxy validated
+- End-to-end workflow and audit retrieval validated through the Dockerized frontend
+- Backend tests inside Docker: 45 passed
+- Docker Compose configuration validation passed
 
-## 10. MVP Scope and Limitations
+## 11. MVP Scope and Limitations
 
 This MVP is designed for academic-support prioritization only.
 
@@ -169,7 +232,7 @@ The scoring thresholds are initial MVP assumptions and should be reviewed and ap
 
 Recommendations are intended to support human academic-support staff, not replace their judgment.
 
-## 11. Future Improvements
+## 12. Future Improvements
 
 Potential future enhancements include:
 
@@ -183,4 +246,4 @@ Potential future enhancements include:
 **Case ID:** AA004
 **Product:** Student Support Case Prioritization
 **Domain:** Education Operations
-**Phase:** 1.1 — Deterministic Agentic AI MVP
+**Phase:** 1.3 — Dockerized Local Deployment & Validation
