@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://aa004-student-support-prioritization.onrender.com/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://aa004-student-support-prioritization.onrender.com/health"
+    }
+  ]
+}
