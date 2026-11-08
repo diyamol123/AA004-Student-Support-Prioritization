@@ -223,8 +223,8 @@ function App() {
         <div className="sidebar-bottom">
           <div className="status-dot" />
           <div>
-            <strong>Deterministic MVP</strong>
-            <span>Phase 1.2 · Local environment</span>
+            <strong>Deterministic Cloud MVP</strong>
+            <span>Phase 1.4 · Cloud environment</span>
           </div>
         </div>
       </aside>
@@ -237,7 +237,7 @@ function App() {
             <p>Evidence-led prioritization for timely academic support.</p>
           </div>
           <div className="top-status">
-            <span className="status-dot" /> Workflow API
+            <span className="status-dot" /> Live workflow API
           </div>
         </header>
 
@@ -660,7 +660,7 @@ function App() {
         )}
 
         <footer className="page-footer">
-          AA004 · Student Support Case Prioritization · Phase 1.2 MVP
+          AA004 · Student Support Case Prioritization · Phase 1.4 Cloud MVP
         </footer>
       </main>
     </div>
