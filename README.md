@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation**
+**RealRails Agentic AI Batch 2 | Phase 2.1 — LangGraph Linear Orchestration**
 
 ## 1. Project Overview
 
@@ -13,7 +13,7 @@ The system evaluates approved academic-support indicators, including:
 - Student engagement status
 - Days since last activity
 - Unresolved support tickets
-- Optional recent activity indicators (included as case evidence; not independently scored)
+- Optional recent activity indicators
 
 It generates an explainable recommendation, priority score, supporting evidence, and audit record.
 
@@ -23,11 +23,11 @@ It generates an explainable recommendation, priority score, supporting evidence,
 
 Academic support teams receive multiple student support requests and need a consistent way to identify cases that may require additional attention.
 
-This MVP provides a structured prioritization workflow that helps coordinators identify cases for follow-up, priority outreach, tutor review, or additional information.
+This MVP provides a structured prioritization workflow that helps coordinators identify cases for routine follow-up, priority outreach, tutor review, or additional information.
 
 ## 3. Agent Architecture
 
-The application uses five specialized agents:
+The application uses five specialized deterministic agents:
 
 1. **Case Intake Agent** — validates and normalizes incoming case information.
 2. **Attendance Agent** — evaluates attendance indicators.
@@ -35,28 +35,76 @@ The application uses five specialized agents:
 4. **Support Load Agent** — evaluates missed submissions and unresolved support tickets.
 5. **Student Support Decision Agent** — combines agent outputs and deterministic rules to generate the final recommendation.
 
-Each agent has a defined responsibility and produces structured, traceable outputs.
+The five agents are orchestrated through a compiled LangGraph linear StateGraph.
 
-## 4. Recommendation Types
+## 4. Phase 2.1 — LangGraph Linear Orchestration
+
+The original sequential workflow orchestration has been migrated to LangGraph while preserving the existing deterministic business rules, agent responsibilities, decision logic, and recommendation behavior.
+
+### Seven-node execution sequence
+
+```text
+START
+  |
+  v
+1. Case Intake Agent
+  |
+  v
+2. Attendance Agent
+  |
+  v
+3. Engagement Agent
+  |
+  v
+4. Support Load Agent
+  |
+  v
+5. Student Support Decision Agent
+  |
+  v
+6. Explanation Node
+  |
+  v
+7. Audit Node
+  |
+  v
+END
+```
+
+### Phase 2.1 implementation
+
+- Replaced sequential orchestration with a compiled LangGraph StateGraph.
+- Mapped the existing run-scoped WorkflowContext into shared graph state.
+- Reused all five existing deterministic agents.
+- Preserved the existing decision logic and recommendation outcomes.
+- Added seven-node execution tracing.
+- Integrated node trace information into workflow results and audit records.
+- Displayed actual graph execution progress in the frontend dashboard.
+- Preserved existing API endpoints and frontend functionality.
+
+**Scope:** Linear orchestration only. No conditional routing, LLM, RAG, vector database, or MCP was introduced in Phase 2.1.
+
+## 5. Recommendation Types
 
 The workflow supports four recommendations:
 
 | Recommendation | Meaning |
 |---|---|
-| `NORMAL_FOLLOWUP` | Routine support follow-up |
-| `PRIORITY_OUTREACH` | Priority academic-support outreach |
-| `TUTOR_REVIEW` | Human tutor or coordinator review |
-| `REQUEST_MORE_INFO` | Additional information is required |
+| NORMAL_FOLLOWUP | Routine support follow-up |
+| PRIORITY_OUTREACH | Priority academic-support outreach |
+| TUTOR_REVIEW | Human tutor or coordinator review |
+| REQUEST_MORE_INFO | Additional information is required |
 
 The system calculates a priority score and provides reasons, triggered rules, and evidence for its recommendation.
 
-## 5. Technology Stack
+## 6. Technology Stack
 
 **Backend**
 - Python 3.11+
 - FastAPI
 - Pydantic
 - Pytest
+- LangGraph
 
 **Frontend**
 - React
@@ -65,29 +113,33 @@ The system calculates a priority score and provides reasons, triggered rules, an
 - CSS
 
 **Workflow**
-- Deterministic agent execution
+- Deterministic multi-agent execution
+- LangGraph linear StateGraph
 - Shared workflow context
 - Rule-based prioritization
+- Node execution tracing
 - Audit logging
 
-## 6. Project Structure
+## 7. Project Structure
 
 ```text
 AA004-Student-Support-Prioritization/
 ├── backend/
 │   ├── app/
 │   │   ├── agents/
+│   │   ├── graphs/
+│   │   │   └── student_support_graph.py
 │   │   ├── models/
 │   │   └── services/
 │   ├── tests/
 │   └── main.py
 ├── docs/
-│   ├── Product_Bible.md
-│   ├── 01_Product_Bible_Execution_Guide.md
-│   ├── 02_Deterministic_AgenticAI_Architecture_Guide.md
-│   ├── 03_AI_Assisted_Build_and_Repomix_Guide.md
-│   ├── 04_Workflow_Shared_Context_Explainability_Guide.md
-│   └── AA004_Implementation_Plan.md
+├── evidence/
+│   ├── Phase-1.4/
+│   └── Phase-2.1/
+│       ├── README.md
+│       ├── repomix-output.xml
+│       └── screenshots/
 ├── frontend/
 │   ├── src/
 │   └── package.json
@@ -95,7 +147,7 @@ AA004-Student-Support-Prioritization/
 └── README.md
 ```
 
-## 7. Setup and Execution
+## 8. Setup and Execution
 
 ### Backend
 
@@ -110,9 +162,7 @@ python3 -m uvicorn backend.main:app --reload --port 8000
 
 Backend health endpoint:
 
-```text
-http://127.0.0.1:8000/health
-```
+`http://127.0.0.1:8000/health`
 
 ### Frontend
 
@@ -126,72 +176,15 @@ npm run dev
 
 Open the Vite development URL printed in the terminal, usually:
 
-```text
-http://localhost:5173
-```
+`http://localhost:5173`
 
-### Production build
+### Production build and lint
 
 ```bash
 cd frontend
 npm run build
 npm run lint
 ```
-
-
-## 8. Dockerized Local Deployment
-
-The application can be built and run locally using Docker Compose.
-
-### Prerequisites
-
-- Docker Desktop installed and running
-- Docker Compose V2
-
-### Build the containers
-
-Run from the project root:
-
-    docker compose build
-
-### Start the application
-
-    docker compose up -d
-
-### Access the application
-
-- Frontend: http://localhost:8080
-- Backend health: http://localhost:8000/health
-- Frontend health proxy: http://localhost:8080/health
-- API documentation: http://localhost:8000/docs
-
-### Check container health
-
-    docker compose ps
-
-Both backend and frontend containers should report healthy status.
-
-### View application logs
-
-    docker compose logs
-
-For individual services:
-
-    docker compose logs backend
-    docker compose logs frontend
-
-### Stop the containers
-
-    docker compose down
-
-### Troubleshooting
-
-- If a port is already in use, stop the conflicting application or configure BACKEND_PORT and FRONTEND_PORT.
-- If the backend is not healthy, inspect it using docker compose logs backend.
-- If the frontend cannot reach the backend, check BACKEND_URL and backend container health.
-- Rebuild after changing application code or Docker configuration using docker compose up -d --build.
-
-The audit service currently uses in-memory storage. Audit records are available while the backend process is running and are not persisted across backend restarts.
 
 ## 9. API Endpoints
 
@@ -201,59 +194,68 @@ The audit service currently uses in-memory storage. Audit records are available 
 | POST | `/api/workflows/run` | Execute prioritization workflow |
 | GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
 
-## 10. Validation Results
+## 10. Phase 2.1 Validation Results
 
 Latest local validation:
 
-- Backend tests: **45 passed**
-- Frontend TypeScript compilation: passed
-- Vite production build: passed
+- Backend tests: **46 passed**
+- Frontend production build: passed
 - Frontend ESLint: passed
-- Four demo scenarios tested successfully
-- Five-agent workflow execution verified
-- Audit record retrieval verified
-- Backend Docker image built successfully
-- Frontend Docker image built successfully
-- Backend and frontend containers started successfully
-- Both container health checks passed
-- Nginx reverse proxy validated
-- End-to-end workflow and audit retrieval validated through the Dockerized frontend
-- Backend tests inside Docker: 45 passed
-- Docker Compose configuration validation passed
+- Four Product Bible scenarios: tested successfully
+- LangGraph graph compilation and seven-node execution: verified
+- Expected node execution order: verified
+- Workflow state and node trace: verified
+- Recommendation and deterministic decision behavior: preserved
+- Explanation and audit integration: verified
+- API workflow and audit integration: verified
 
-## 11. MVP Scope and Limitations
+## 11. Submission Evidence
+
+Phase 2.1 evidence is available in `evidence/Phase-2.1/`:
+
+- `README.md` — Component mapping, execution order, changes, and validation.
+- `01-working-dashboard.png` — Working application.
+- `02-langgraph-execution.png` — Seven-node execution trace.
+- `03-workflow-state.png` — Workflow state.
+- `04-explanation-audit.png` — Explanation and audit results.
+- `repomix-output.xml` — Latest regenerated project snapshot.
+
+## 12. MVP Scope and Limitations
 
 This MVP is designed for academic-support prioritization only.
 
-It does not make grading, disciplinary, admission, or academic penalty decisions.
+- It does not make grading, disciplinary, admission, or academic penalty decisions.
+- It does not use protected or sensitive personal characteristics for prioritization.
+- Scoring thresholds are initial MVP assumptions and should be reviewed and approved by the institution before operational use.
+- Recommendations support human academic-support staff and do not replace their judgment.
+- Audit records are currently held in backend memory and are not retained after a backend restart.
 
-It does not use protected or sensitive personal characteristics for prioritization.
-
-The scoring thresholds are initial MVP assumptions and should be reviewed and approved by the institution before operational use.
-
-Recommendations are intended to support human academic-support staff, not replace their judgment.
-
-## 12. Future Improvements
+## 13. Future Improvements
 
 Potential future enhancements include:
 
-- Configurable institutional prioritization thresholds
-- Expanded audit and reporting capabilities
-- Integration with approved student-support systems
-- Further workflow orchestration capabilities
+- Deterministic conditional workflow routing.
+- Configurable institutional prioritization thresholds.
+- Expanded audit and reporting capabilities.
+- Integration with approved student-support systems.
+- Further workflow orchestration capabilities.
 
----
+## 14. Project Information
 
-**Case ID:** AA004
-**Product:** Student Support Case Prioritization
-**Domain:** Education Operations
-**Phase:** 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation
+**Case ID:** AA004  
+**Product:** Student Support Case Prioritization  
+**Domain:** Education Operations  
+**Current implementation:** Phase 2.1 — LangGraph Linear Orchestration
 
+### Existing Phase 1.4 Deployment
 
-## Phase 1.4 Deployment
+The following deployment remains the Phase 1.4 cloud version. Phase 2.1 has been committed and pushed to GitHub but has not been deployed.
 
 - Frontend: https://aa-004-student-support-prioritizati.vercel.app/
 - Backend health: https://aa004-student-support-prioritization.onrender.com/health
 
 The Render free instance may take time to wake after inactivity.
-Audit records are held in backend memory and are not retained after a backend restart.
+
+---
+
+**Current Status:** Phase 2.1 implementation and local validation completed. Awaiting reviewer acceptance.
