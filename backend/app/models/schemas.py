@@ -90,6 +90,7 @@ class WorkflowContext(BaseModel):
     final_recommendation: FinalRecommendation | None = None
     explanation: list[str] = Field(default_factory=list)
     audit_reference: str | None = None
+    node_trace: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)

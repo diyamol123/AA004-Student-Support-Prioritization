@@ -57,6 +57,7 @@ type WorkflowResult = {
   support_load_flag: string | null
   scores: Record<string, number>
   agent_outputs: AgentOutput[]
+  node_trace?: string[]
   final_recommendation: Recommendation | null
   explanation: string | string[]
   audit_reference: string | null
@@ -260,8 +261,8 @@ function App() {
         <div className="sidebar-bottom">
           <div className="status-dot" />
           <div>
-            <strong>Deterministic Cloud MVP</strong>
-            <span>Phase 1.4 · Cloud environment</span>
+            <strong>LangGraph Linear Orchestration</strong>
+            <span>Phase 2.1 · LangGraph workflow</span>
           </div>
         </div>
       </aside>
@@ -281,8 +282,8 @@ function App() {
         <section className="overview-grid">
           <div className="overview-card">
             <span className="metric-label">WORKFLOW</span>
-            <strong>5 agents</strong>
-            <small>Specialized responsibilities</small>
+            <strong>7 graph nodes</strong>
+            <small>5 agents · 7 execution nodes</small>
           </div>
           <div className="overview-card">
             <span className="metric-label">DECISION MODEL</span>
@@ -630,9 +631,31 @@ function App() {
                 <div>
                   <span className="section-kicker">03 / EXECUTION TRACE</span>
                   <h2>Agent workflow</h2>
-                  <p>Actual agent outputs returned by the backend.</p>
+                  <p>Seven-node LangGraph execution trace and actual agent outputs returned by the backend.</p>
                 </div>
                 <span className="count-tag">{result.agent_outputs.length} agents</span>
+              </div>
+
+              <div className="graph-trace">
+                <div className="graph-trace-heading">
+                  <strong>LangGraph linear execution</strong>
+                  <span>{result.node_trace?.length ?? 0} / 7 nodes completed</span>
+                </div>
+                {result.node_trace?.length ? (
+                  <ol className="graph-node-list">
+                    {result.node_trace.map((node, index) => (
+                      <li key={`${node}-${index}`}>
+                        <span className="graph-node-number">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <strong>{node}</strong>
+                        <span className="graph-node-status">Completed</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className="muted">No LangGraph node trace was returned.</p>
+                )}
               </div>
 
               <div className="agent-list">
@@ -735,7 +758,7 @@ function App() {
         )}
 
         <footer className="page-footer">
-          AA004 · Student Support Case Prioritization · Phase 1.4 Cloud MVP
+          AA004 · Student Support Case Prioritization · Phase 2.1 · LangGraph Orchestration
         </footer>
       </main>
     </div>

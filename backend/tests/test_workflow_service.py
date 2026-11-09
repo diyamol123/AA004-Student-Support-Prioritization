@@ -164,3 +164,36 @@ def test_decision_references_all_four_upstream_agents():
         "Engagement Agent",
         "Support Load Agent",
     ]
+
+
+def test_langgraph_executes_all_seven_nodes_and_records_trace():
+    case = StudentCaseInput(
+        case_id="CASE-LANGGRAPH-TRACE-001",
+        attendance_rate=95,
+        missed_submissions=0,
+        engagement_status="active",
+        days_since_last_activity=2,
+        unresolved_support_tickets=0,
+    )
+
+    context = run_student_support_workflow(case)
+
+    expected_trace = [
+        "Case Intake Agent",
+        "Attendance Agent",
+        "Engagement Agent",
+        "Support Load Agent",
+        "Student Support Decision Agent",
+        "Explanation Node",
+        "Audit Node",
+    ]
+
+    audit = get_audit_record(context.audit_reference)
+
+    assert context.node_trace == expected_trace
+    assert audit is not None
+    assert audit["node_trace"] == expected_trace
+    assert len(context.agent_outputs) == 5
+    assert context.final_recommendation.action == (
+        RecommendationAction.NORMAL_FOLLOWUP
+    )
