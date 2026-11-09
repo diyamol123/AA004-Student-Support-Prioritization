@@ -1,7 +1,7 @@
 # RealRails Batch 2 — Workflow, Shared Context & Explainability Guide
 ## Purpose
 
-Use this guide in Phase 1.2 to make the working application explain its own Agentic AI flow.
+Use this guide in Phase 1.4 to make the working application explain its own Agentic AI flow.
 
 ---
 

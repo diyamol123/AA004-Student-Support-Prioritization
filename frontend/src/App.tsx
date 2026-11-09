@@ -8,6 +8,7 @@ type CaseInput = {
   engagement_status: string
   days_since_last_activity: number | null
   unresolved_support_tickets: number | null
+  recent_activity_indicators: string[]
 }
 
 type Evidence = {
@@ -70,6 +71,7 @@ const initialCase: CaseInput = {
   engagement_status: 'inactive',
   days_since_last_activity: 18,
   unresolved_support_tickets: 2,
+  recent_activity_indicators: [],
 }
 
 const scenarios: { label: string; value: CaseInput }[] = [
@@ -82,6 +84,7 @@ const scenarios: { label: string; value: CaseInput }[] = [
       engagement_status: 'active',
       days_since_last_activity: 2,
       unresolved_support_tickets: 0,
+      recent_activity_indicators: [],
     },
   },
   {
@@ -97,6 +100,7 @@ const scenarios: { label: string; value: CaseInput }[] = [
       engagement_status: 'active',
       days_since_last_activity: 18,
       unresolved_support_tickets: 0,
+      recent_activity_indicators: [],
     },
   },
   {
@@ -108,6 +112,7 @@ const scenarios: { label: string; value: CaseInput }[] = [
       engagement_status: 'unknown',
       days_since_last_activity: null,
       unresolved_support_tickets: 0,
+      recent_activity_indicators: [],
     },
   },
 ]
@@ -127,6 +132,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [auditLoading, setAuditLoading] = useState(false)
   const [error, setError] = useState('')
+  const [activeSection, setActiveSection] = useState('case-prioritization')
 
   function updateField<K extends keyof CaseInput>(key: K, value: CaseInput[K]) {
     setCaseData((current) => ({ ...current, [key]: value }))
@@ -195,6 +201,22 @@ function App() {
     }
   }
 
+  function navigateTo(sectionId: string) {
+    const target = document.getElementById(sectionId)
+
+    if (!target) {
+      setError('Run a workflow first to view the agent workflow and audit evidence.')
+      document.getElementById('case-prioritization')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+      return
+    }
+
+    setActiveSection(sectionId)
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const recommendation = result?.final_recommendation
   const actionClass = recommendation?.action.toLowerCase().replaceAll('_', '-')
 
@@ -210,15 +232,30 @@ function App() {
         </div>
 
         <div className="side-label">WORKSPACE</div>
-        <div className="nav-item active">
+        <button
+          className={`nav-item ${activeSection === 'case-prioritization' ? 'active' : ''}`}
+          type="button"
+          onClick={() => navigateTo('case-prioritization')}
+          aria-current={activeSection === 'case-prioritization' ? 'location' : undefined}
+        >
           <span>▦</span> Case prioritization
-        </div>
-        <div className="nav-item">
+        </button>
+        <button
+          className={`nav-item ${activeSection === 'agent-workflow' ? 'active' : ''}`}
+          type="button"
+          onClick={() => navigateTo('agent-workflow')}
+          aria-current={activeSection === 'agent-workflow' ? 'location' : undefined}
+        >
           <span>◎</span> Agent workflow
-        </div>
-        <div className="nav-item">
+        </button>
+        <button
+          className={`nav-item ${activeSection === 'audit-evidence' ? 'active' : ''}`}
+          type="button"
+          onClick={() => navigateTo('audit-evidence')}
+          aria-current={activeSection === 'audit-evidence' ? 'location' : undefined}
+        >
           <span>◷</span> Audit evidence
-        </div>
+        </button>
 
         <div className="sidebar-bottom">
           <div className="status-dot" />
@@ -260,7 +297,7 @@ function App() {
         </section>
 
         <div className="workspace-grid">
-          <section className="panel input-panel">
+          <section className="panel input-panel" id="case-prioritization">
             <div className="panel-heading">
               <div>
                 <span className="section-kicker">01 / CASE INTAKE</span>
@@ -374,6 +411,28 @@ function App() {
                       )
                     }
                   />
+                </div>
+                <div className="form-field full-width">
+                  <label htmlFor="recent-activity">RECENT ACTIVITY INDICATORS</label>
+                  <textarea
+                    id="recent-activity"
+                    rows={3}
+                    value={caseData.recent_activity_indicators.join('\n')}
+                    placeholder={'Example:\nAttended support session\nSubmitted coursework'}
+                    onChange={(e) =>
+                      updateField(
+                        'recent_activity_indicators',
+                        e.target.value
+                          .split(/[\n,]+/)
+                          .map((item) => item.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                  />
+                  <p className="form-note">
+                    Optional. Enter one indicator per line or separate indicators with commas.
+                    These are included in the case evidence; they do not independently change scoring.
+                  </p>
                 </div>
               </div>
 
@@ -548,9 +607,25 @@ function App() {
 
         {error && <div className="error-banner">Request error: {error}</div>}
 
+        {!result && (
+          <>
+            <section className="panel agents-panel" id="agent-workflow">
+              <span className="section-kicker">03 / EXECUTION TRACE</span>
+              <h2>Agent workflow</h2>
+              <p>Run a case to view the five-agent execution trace and each agent's results.</p>
+            </section>
+
+            <section className="panel audit-panel" id="audit-evidence">
+              <span className="section-kicker">05 / AUDITABILITY</span>
+              <h2>Audit evidence</h2>
+              <p>Run a case to generate an audit reference and retrieve its evidence record.</p>
+            </section>
+          </>
+        )}
+
         {result && (
           <>
-            <section className="panel agents-panel">
+            <section className="panel agents-panel" id="agent-workflow">
               <div className="panel-heading">
                 <div>
                   <span className="section-kicker">03 / EXECUTION TRACE</span>
@@ -626,7 +701,7 @@ function App() {
                 )}
               </div>
 
-              <div className="panel audit-panel">
+              <div className="panel audit-panel" id="audit-evidence">
                 <span className="section-kicker">05 / AUDITABILITY</span>
                 <h2>Audit record</h2>
                 <p className="audit-reference">{result.audit_reference}</p>

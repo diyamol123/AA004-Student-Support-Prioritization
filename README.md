@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 1.3 — Dockerized Local Deployment & Validation**
+**RealRails Agentic AI Batch 2 | Phase 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation**
 
 ## 1. Project Overview
 
@@ -13,6 +13,7 @@ The system evaluates approved academic-support indicators, including:
 - Student engagement status
 - Days since last activity
 - Unresolved support tickets
+- Optional recent activity indicators (included as case evidence; not independently scored)
 
 It generates an explainable recommendation, priority score, supporting evidence, and audit record.
 
@@ -246,4 +247,13 @@ Potential future enhancements include:
 **Case ID:** AA004
 **Product:** Student Support Case Prioritization
 **Domain:** Education Operations
-**Phase:** 1.3 — Dockerized Local Deployment & Validation
+**Phase:** 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation
+
+
+## Phase 1.4 Deployment
+
+- Frontend: https://aa-004-student-support-prioritizati.vercel.app/
+- Backend health: https://aa004-student-support-prioritization.onrender.com/health
+
+The Render free instance may take time to wake after inactivity.
+Audit records are held in backend memory and are not retained after a backend restart.

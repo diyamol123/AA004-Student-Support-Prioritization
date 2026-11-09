@@ -308,3 +308,82 @@
   color: #27845b;
   font-weight: 600;
 }
+
+
+/* Phase 1.4 — Interactive workspace navigation */
+.nav-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  text-align: left;
+  font: inherit;
+  color: #aab5ca;
+  background: transparent;
+  padding: 13px 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.nav-item:hover,
+.nav-item:focus-visible {
+  color: #fff;
+  background: #293653;
+  outline: none;
+}
+
+.nav-item:focus-visible {
+  box-shadow: 0 0 0 2px #a9a4ff;
+}
+
+.form-field textarea {
+  display: block;
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  border: 1px solid #e1e5ed;
+  border-radius: 7px;
+  padding: 10px 11px;
+  color: #26334b;
+  background: #fff;
+  outline: none;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.form-field textarea:focus {
+  border-color: #7772dc;
+  box-shadow: 0 0 0 2px rgba(119, 114, 220, 0.12);
+}
+
+.input-panel,
+.agents-panel,
+.audit-panel {
+  scroll-margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+  .side-label {
+    display: block;
+    padding-bottom: 8px;
+  }
+
+  .nav-item {
+    display: inline-block;
+    width: auto;
+    margin: 0 4px 4px 0;
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+
+  .sidebar-bottom {
+    display: flex;
+    margin-top: 8px;
+  }
+
+  .brand {
+    padding-bottom: 12px;
+  }
+}
