@@ -35,6 +35,7 @@ The content is organized as follows:
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
+- Git logs (5 commits) are included to show development patterns
 </notes>
 
 </file_summary>
@@ -92,6 +93,11 @@ evidence/
     Screenshot 2026-11-08 at 13.27.52.png
     Screenshot 2026-11-08 at 13.28.00.png
     Screenshot 2026-11-08 at 13.31.59.png
+  Phase-1.4/
+    01-Live-Dashboard.png
+    02-Workflow-Execution.png
+    03-Agent-Execution.png
+    04-Audit-Evidence.png
   01-Dashboard.png
   02-Successful-Workflow.png
   03-Audit-Evidence.png
@@ -2323,173 +2329,6 @@ Submit Evidence
 ```
 </file>
 
-<file path="docs/04_Workflow_Shared_Context_Explainability_Guide.md">
-# RealRails Batch 2 — Workflow, Shared Context & Explainability Guide
-## Purpose
-
-Use this guide in Phase 1.2 to make the working application explain its own Agentic AI flow.
-
----
-
-## What the Reviewer Must Understand
-
-The application should make it possible to answer:
-
-1. What business input started the workflow?
-2. Which agents executed?
-3. What does each agent do?
-4. What did each agent read?
-5. What did each agent produce?
-6. How did the shared context change?
-7. Which deterministic rules influenced the result?
-8. Where was the final recommendation made?
-9. Why was that recommendation produced?
-10. Where is the audit evidence?
-
----
-
-## Required Concept
-
-Use the term:
-
-> **Run-scoped shared workflow context**
-
-It is the structured state used during one workflow execution.
-
-It is not automatically:
-
-- long-term memory
-- semantic memory
-- persistent agent memory
-- an AI brain
-
----
-
-## Recommended Context View
-
-A case may expose:
-
-```text
-workflow_id
-business_input
-validated_input
-
-shared_context
-  ├─ reference/domain data
-  ├─ calculated fields
-  └─ current workflow status
-
-agent_outputs
-  ├─ agent_a
-  ├─ agent_b
-  ├─ agent_c
-  └─ ...
-
-final_recommendation
-explanation
-audit_reference
-errors
-```
-
-Only show fields that actually exist.
-
----
-
-## Recommended UI Patterns
-
-Use one simple pattern or combination:
-
-- agent execution timeline
-- workflow console
-- expandable agent cards
-- shared-context panel
-- decision-evidence panel
-- audit panel
-
-The UI should be functional, not theatrical.
-
-Avoid creating a separate animated HTML learning assignment.
-
----
-
-## Agent Card Minimum
-
-A reviewer should be able to see:
-
-```text
-Agent Name
-Responsibility
-Input Used
-Output Produced
-Status
-Evidence / Rule Result
-```
-
-Do not pretend agents are natural-language chat participants unless that is actually implemented.
-
----
-
-## Explanation Rules
-
-Explanation should be derived from:
-
-- agent outputs
-- triggered rules
-- scores
-- matched evidence
-- missing-data flags
-- decision result
-
-In Phase 1, deterministic explanation templates are sufficient.
-
-Do not invent evidence.
-
----
-
-## Audit Rules
-
-Audit should allow a reviewer to trace:
-
-```text
-Input
-→ Execution
-→ Agent Outputs
-→ Rule Triggers
-→ Final Recommendation
-```
-
-An in-memory audit is acceptable for the MVP if clearly stated.
-
----
-
-## Product Bible Alignment
-
-The Product Bible controls:
-
-- agent names/responsibilities
-- domain fields
-- rule meaning
-- decision output
-- evidence requirements
-
-The generic workflow view must adapt to the selected case.
-
-Do not force every project to display identical domain content.
-
----
-
-## Completion Check
-
-- [ ] actual agents are visible
-- [ ] execution order is accurate
-- [ ] shared context is visible or inspectable
-- [ ] rule/evidence is visible
-- [ ] final recommendation is visible
-- [ ] explanation is evidence-based
-- [ ] audit reference exists
-- [ ] UI does not claim nonexistent functionality
-</file>
-
 <file path="docs/Product_Bible.md">
 # AA004 — Student Support Case Prioritization
 ## RealRails Agentic AI Batch 2 — Product Bible
@@ -3160,21 +2999,187 @@ services:
     restart: unless-stopped
 </file>
 
+<file path="docs/04_Workflow_Shared_Context_Explainability_Guide.md">
+# RealRails Batch 2 — Workflow, Shared Context & Explainability Guide
+## Purpose
+
+Use this guide in Phase 1.4 to make the working application explain its own Agentic AI flow.
+
+---
+
+## What the Reviewer Must Understand
+
+The application should make it possible to answer:
+
+1. What business input started the workflow?
+2. Which agents executed?
+3. What does each agent do?
+4. What did each agent read?
+5. What did each agent produce?
+6. How did the shared context change?
+7. Which deterministic rules influenced the result?
+8. Where was the final recommendation made?
+9. Why was that recommendation produced?
+10. Where is the audit evidence?
+
+---
+
+## Required Concept
+
+Use the term:
+
+> **Run-scoped shared workflow context**
+
+It is the structured state used during one workflow execution.
+
+It is not automatically:
+
+- long-term memory
+- semantic memory
+- persistent agent memory
+- an AI brain
+
+---
+
+## Recommended Context View
+
+A case may expose:
+
+```text
+workflow_id
+business_input
+validated_input
+
+shared_context
+  ├─ reference/domain data
+  ├─ calculated fields
+  └─ current workflow status
+
+agent_outputs
+  ├─ agent_a
+  ├─ agent_b
+  ├─ agent_c
+  └─ ...
+
+final_recommendation
+explanation
+audit_reference
+errors
+```
+
+Only show fields that actually exist.
+
+---
+
+## Recommended UI Patterns
+
+Use one simple pattern or combination:
+
+- agent execution timeline
+- workflow console
+- expandable agent cards
+- shared-context panel
+- decision-evidence panel
+- audit panel
+
+The UI should be functional, not theatrical.
+
+Avoid creating a separate animated HTML learning assignment.
+
+---
+
+## Agent Card Minimum
+
+A reviewer should be able to see:
+
+```text
+Agent Name
+Responsibility
+Input Used
+Output Produced
+Status
+Evidence / Rule Result
+```
+
+Do not pretend agents are natural-language chat participants unless that is actually implemented.
+
+---
+
+## Explanation Rules
+
+Explanation should be derived from:
+
+- agent outputs
+- triggered rules
+- scores
+- matched evidence
+- missing-data flags
+- decision result
+
+In Phase 1, deterministic explanation templates are sufficient.
+
+Do not invent evidence.
+
+---
+
+## Audit Rules
+
+Audit should allow a reviewer to trace:
+
+```text
+Input
+→ Execution
+→ Agent Outputs
+→ Rule Triggers
+→ Final Recommendation
+```
+
+An in-memory audit is acceptable for the MVP if clearly stated.
+
+---
+
+## Product Bible Alignment
+
+The Product Bible controls:
+
+- agent names/responsibilities
+- domain fields
+- rule meaning
+- decision output
+- evidence requirements
+
+The generic workflow view must adapt to the selected case.
+
+Do not force every project to display identical domain content.
+
+---
+
+## Completion Check
+
+- [ ] actual agents are visible
+- [ ] execution order is accurate
+- [ ] shared context is visible or inspectable
+- [ ] rule/evidence is visible
+- [ ] final recommendation is visible
+- [ ] explanation is evidence-based
+- [ ] audit reference exists
+- [ ] UI does not claim nonexistent functionality
+</file>
+
 <file path="docs/AA004_Implementation_Plan.md">
 # AA004 — Implementation Plan
 ## Student Support Case Prioritization
-## Phase 1.2 — Workflow Visualization & Evidence
+## Phase 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation
 
 ## 1. Source of Truth
 
-1. Current RealRails Phase 1.1 GitHub post
-2. AA004 Product Bible
-3. RealRails generic feeder guides 01–04
-4. Latest repository implementation / Repomix
+1. AA004 Product Bible
+2. Current repository implementation and tests
+3. RealRails generic feeder guides
+4. Latest Phase 1.4 evidence
 5. ABIP as an architecture-learning reference only
 
-The Product Bible controls domain responsibilities, business inputs,
-outputs, rules, boundaries and acceptance criteria.
+The Product Bible controls domain responsibilities, business inputs, outputs, rules, boundaries and acceptance criteria. The implementation and tests establish the currently delivered behaviour.
 
 ## 2. Technology
 
@@ -3189,18 +3194,25 @@ Frontend:
 - React
 - Vite
 - TypeScript
+- CSS
 
-Data:
-- Seeded JSON/Python data
-- In-memory workflow audit for the MVP
+Workflow:
+- Five deterministic agents
+- Sequential execution
+- Run-scoped shared workflow context
+- Rule-based prioritization
+- In-memory audit records
+
+Deployment:
+- Render backend
+- Vercel frontend
+- Frontend API proxy to the deployed backend
 
 ## 3. Workflow Architecture
 
 Business Input
     ↓
 Input Validation / Adapter
-    ↓
-Context Builder
     ↓
 Run-Scoped Shared Workflow Context
     ↓
@@ -3222,42 +3234,21 @@ Audit Trail
     ↓
 Business UI
 
-Agents execute sequentially in the Phase 1.2 workflow.
+The five agents execute sequentially within the same workflow run.
 
 ## 4. Required Agents
 
-### Case Intake Agent
-Input: student_case
-Output: validated_case
-Responsibility: validate and normalize the submitted support case.
+1. Case Intake Agent — validates and normalizes the submitted case.
+2. Attendance Agent — evaluates attendance indicators.
+3. Engagement Agent — evaluates engagement status and inactivity.
+4. Support Load Agent — evaluates missed submissions and unresolved support tickets.
+5. Student Support Decision Agent — combines upstream outputs and applies deterministic decision rules.
 
-### Attendance Agent
-Input: validated_case and attendance evidence
-Output: attendance_flag and score
-Responsibility: evaluate attendance against configured thresholds.
-
-### Engagement Agent
-Input: validated_case and engagement evidence
-Output: engagement_flag and score
-Responsibility: evaluate participation and inactivity indicators.
-
-### Support Load Agent
-Input: validated_case, submission evidence and ticket evidence
-Output: support_load_flag and score
-Responsibility: evaluate missed submissions and unresolved support requests.
-
-### Student Support Decision Agent
-Input: all preceding agent outputs
-Output: final_recommendation
-Responsibility: combine approved academic-support evidence and apply
-deterministic decision rules.
-
-Each agent must return structured output and traceable evidence.
+Each agent returns structured output and traceable evidence.
 
 ## 5. Run-Scoped Shared Workflow Context
 
-The workflow context must contain at least:
-
+The context includes:
 - workflow_id
 - student_case
 - validated_case
@@ -3273,121 +3264,98 @@ The workflow context must contain at least:
 
 The context belongs to one workflow execution. It is not long-term memory.
 
-## 6. Decision Configuration
+## 6. Input Fields
 
-The Product Bible requires configured thresholds and a fixed support-priority
-score but does not prescribe numeric values.
+The case input supports:
+- case_id
+- attendance_rate
+- missed_submissions
+- engagement_status
+- days_since_last_activity
+- unresolved_support_tickets
+- recent_activity_indicators
 
-Therefore, numeric defaults will be documented as configurable demonstration
-assumptions, not official institutional policy.
+Numeric fields remain numeric in the submitted JSON. Empty optional numeric fields are submitted as null.
 
-Proposed initial configuration:
+Recent activity indicators are optional strings. The intake agent normalizes whitespace and removes case-insensitive duplicates. The indicators are included in the validated case as evidence; the current Engagement Agent does not use them to change scores or recommendations.
+
+## 7. Implemented Decision Precedence
+
+The current deterministic decision agent applies these conditions in order:
+
+1. If a specialist agent cannot complete because essential evidence is missing, return REQUEST_MORE_INFO using RULE-01-INCOMPLETE-EVIDENCE.
+2. If supplied evidence is inconsistent, return TUTOR_REVIEW using RULE-02-INCONSISTENT-EVIDENCE.
+3. If attendance is below 75% and missed submissions are at least two, return PRIORITY_OUTREACH using RULE-03-LOW-ATTENDANCE-AND-MISSED-WORK.
+4. If multiple concerns or any high concern remain, return TUTOR_REVIEW using RULE-04-MULTIPLE-OR-HIGH-CONCERNS.
+5. Otherwise, return NORMAL_FOLLOWUP using RULE-05-NORMAL-FOLLOWUP.
+
+A high priority score by itself does not trigger PRIORITY_OUTREACH. The specific decision conditions above control the recommendation.
+
+## 8. Demonstration Thresholds
 
 Attendance:
 - Below 75%: high concern, 30 points
 - 75% to below 85%: moderate concern, 15 points
-- 85% or above: no attendance concern, 0 points
+- 85% or above: no attendance concern
 
 Missed submissions:
 - Two or more: high concern, 30 points
 - One: moderate concern, 15 points
-- Zero: no submission concern, 0 points
+- Zero: no submission concern
 
 Engagement:
-- Inactive for 14 or more days: high concern, 20 points
-- Inactive for 7–13 days: moderate concern, 10 points
-- More recent activity: no inactivity concern, 0 points
+- 14 or more days since activity: high concern, 20 points
+- 7–13 days: moderate concern, 10 points
+- Fewer than 7 days: no inactivity concern
 
 Unresolved support tickets:
 - Two or more: high concern, 20 points
 - One: moderate concern, 10 points
-- Zero: no ticket-load concern, 0 points
+- Zero: no ticket-load concern
 
-Maximum configured score: 100.
+These are MVP demonstration thresholds, not official institutional policy.
 
-These values are editable configuration, not hard-coded policy claims.
-They must be identified as demo assumptions in the application.
+## 9. Seeded Regression Scenarios
 
-## 7. Decision Precedence
+| Scenario | Expected action | Expected rule |
+|---|---|---|
+| Normal progress | NORMAL_FOLLOWUP | RULE-05-NORMAL-FOLLOWUP |
+| Priority outreach | PRIORITY_OUTREACH | RULE-03-LOW-ATTENDANCE-AND-MISSED-WORK |
+| Conflicting evidence | TUTOR_REVIEW | RULE-02-INCONSISTENT-EVIDENCE |
+| Incomplete information | REQUEST_MORE_INFO | RULE-01-INCOMPLETE-EVIDENCE |
 
-Apply decision conditions in this order:
+Each scenario should be executed through the deployed frontend and checked against the returned workflow context, five agent outputs, scores, flags, explanation, recommendation and audit reference.
 
-1. Missing essential evidence:
-   REQUEST_MORE_INFO.
+## 10. Frontend Requirements
 
-2. Conflicting or inconsistent evidence:
-   TUTOR_REVIEW.
+The interface displays:
+- student support case input
+- numeric attendance and support indicators
+- optional recent activity indicators
+- four demo scenarios
+- priority score and recommendation
+- actual agent execution trace
+- shared workflow context
+- decision explanation and triggered rules
+- audit reference and retrieved audit record
 
-3. High combination of low attendance and multiple missed submissions:
-   PRIORITY_OUTREACH.
+Sidebar navigation links to Case Prioritization, Agent Workflow and Audit Evidence. Navigation remains visible on mobile.
 
-4. Configured high-priority score band:
-   PRIORITY_OUTREACH.
+The interface must not simulate agent activity.
 
-5. Multiple support concerns requiring human assessment:
-   TUTOR_REVIEW.
+## 11. Audit
 
-6. No major support concerns or only a single mild concern:
-   NORMAL_FOLLOWUP.
-
-All score bands and configurable conditions must be explicit,
-deterministic and covered by tests.
-
-## 8. Explanation and Evidence
-
-Generate explanation from actual workflow execution.
-
-Show:
-- agents executed and execution order
-- agent responsibilities and conclusions
-- evidence used by each agent
-- configured thresholds and triggered rules
-- score calculation
-- reason for the final recommendation
-- missing data and limitations
-
-Do not invent evidence or claim an agent executed when it did not.
-
-## 9. Audit
-
-Record:
+Audit records include:
 - workflow_id
 - input reference
 - execution timestamp
 - agent execution sequence
-- major agent outputs
-- triggered decision rules
+- agent outputs
+- triggered rules
 - final recommendation
-- errors or fallback state
+- errors
 
-An in-memory audit store is sufficient for this MVP.
-
-## 10. Seeded Scenarios
-
-1. Normal progress:
-   Expected action: NORMAL_FOLLOWUP.
-
-2. Low attendance and missed submissions:
-   Expected action: PRIORITY_OUTREACH.
-
-3. Attendance unavailable:
-   Expected action: REQUEST_MORE_INFO.
-
-All scenarios must be reproducible and testable.
-
-## 11. Frontend Requirements
-
-The React interface must display:
-- student support case summary
-- attendance, engagement and support indicators
-- priority score
-- actual agent execution trace
-- agent inputs and outputs
-- final recommended action
-- explanation and decision evidence
-- audit reference
-
-The interface must not simulate agent activity.
+The MVP audit store is in memory. Records are not retained after a backend process restart or replacement.
 
 ## 12. MVP Boundaries
 
@@ -3396,7 +3364,6 @@ Do not implement:
 - admissions decisions
 - behavioral profiling
 - sensitive personal characteristics
-- external production integrations
 - LangGraph
 - LLMs
 - RAG or vector databases
@@ -3404,22 +3371,26 @@ Do not implement:
 - long-term agent memory
 - Kubernetes
 
-Conditional routing and controlled LLM enhancements belong to later phases.
+These are outside the current Phase 1.4 scope.
 
 ## 13. Validation Checklist
 
-- [ ] Backend and frontend start successfully.
-- [ ] Health endpoint works.
-- [ ] Student support input is validated.
-- [ ] All five agents execute.
+- [ ] Backend health endpoint responds.
+- [ ] Frontend reaches the deployed backend through its API proxy.
+- [ ] Numeric inputs are submitted as numbers or null.
+- [ ] Recent activity indicators are submitted as a string array.
+- [ ] All five agents execute in sequence.
 - [ ] Shared workflow context is populated.
-- [ ] Configured rules affect the result.
-- [ ] Recommendation is structured.
-- [ ] Explanation uses actual evidence.
-- [ ] Audit reference is available.
-- [ ] All three seeded scenarios pass.
-- [ ] Frontend displays the real workflow.
-- [ ] Latest Repomix is generated after MVP validation.
+- [ ] Normal progress returns NORMAL_FOLLOWUP.
+- [ ] Priority outreach returns PRIORITY_OUTREACH.
+- [ ] Conflicting evidence returns TUTOR_REVIEW.
+- [ ] Incomplete information returns REQUEST_MORE_INFO.
+- [ ] Explanations and evidence match actual execution.
+- [ ] Audit records can be retrieved during the same backend process.
+- [ ] Sidebar navigation works on desktop and mobile.
+- [ ] Backend tests pass.
+- [ ] Frontend build and lint pass.
+- [ ] Latest Repomix and Phase 1.4 screenshots are captured.
 </file>
 
 <file path="frontend/src/App.css">
@@ -3733,6 +3704,85 @@ Conditional routing and controlled LLM enhancements belong to later phases.
   color: #27845b;
   font-weight: 600;
 }
+
+
+/* Phase 1.4 — Interactive workspace navigation */
+.nav-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  text-align: left;
+  font: inherit;
+  color: #aab5ca;
+  background: transparent;
+  padding: 13px 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.nav-item:hover,
+.nav-item:focus-visible {
+  color: #fff;
+  background: #293653;
+  outline: none;
+}
+
+.nav-item:focus-visible {
+  box-shadow: 0 0 0 2px #a9a4ff;
+}
+
+.form-field textarea {
+  display: block;
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  border: 1px solid #e1e5ed;
+  border-radius: 7px;
+  padding: 10px 11px;
+  color: #26334b;
+  background: #fff;
+  outline: none;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.form-field textarea:focus {
+  border-color: #7772dc;
+  box-shadow: 0 0 0 2px rgba(119, 114, 220, 0.12);
+}
+
+.input-panel,
+.agents-panel,
+.audit-panel {
+  scroll-margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+  .side-label {
+    display: block;
+    padding-bottom: 8px;
+  }
+
+  .nav-item {
+    display: inline-block;
+    width: auto;
+    margin: 0 4px 4px 0;
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+
+  .sidebar-bottom {
+    display: flex;
+    margin-top: 8px;
+  }
+
+  .brand {
+    padding-bottom: 12px;
+  }
+}
 </file>
 
 <file path="frontend/src/App.tsx">
@@ -3746,6 +3796,7 @@ type CaseInput = {
   engagement_status: string
   days_since_last_activity: number | null
   unresolved_support_tickets: number | null
+  recent_activity_indicators: string[]
 }
 
 type Evidence = {
@@ -3808,6 +3859,7 @@ const initialCase: CaseInput = {
   engagement_status: 'inactive',
   days_since_last_activity: 18,
   unresolved_support_tickets: 2,
+  recent_activity_indicators: [],
 }
 
 const scenarios: { label: string; value: CaseInput }[] = [
@@ -3820,6 +3872,7 @@ const scenarios: { label: string; value: CaseInput }[] = [
       engagement_status: 'active',
       days_since_last_activity: 2,
       unresolved_support_tickets: 0,
+      recent_activity_indicators: [],
     },
   },
   {
@@ -3835,6 +3888,7 @@ const scenarios: { label: string; value: CaseInput }[] = [
       engagement_status: 'active',
       days_since_last_activity: 18,
       unresolved_support_tickets: 0,
+      recent_activity_indicators: [],
     },
   },
   {
@@ -3846,6 +3900,7 @@ const scenarios: { label: string; value: CaseInput }[] = [
       engagement_status: 'unknown',
       days_since_last_activity: null,
       unresolved_support_tickets: 0,
+      recent_activity_indicators: [],
     },
   },
 ]
@@ -3865,6 +3920,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [auditLoading, setAuditLoading] = useState(false)
   const [error, setError] = useState('')
+  const [activeSection, setActiveSection] = useState('case-prioritization')
 
   function updateField<K extends keyof CaseInput>(key: K, value: CaseInput[K]) {
     setCaseData((current) => ({ ...current, [key]: value }))
@@ -3933,6 +3989,22 @@ function App() {
     }
   }
 
+  function navigateTo(sectionId: string) {
+    const target = document.getElementById(sectionId)
+
+    if (!target) {
+      setError('Run a workflow first to view the agent workflow and audit evidence.')
+      document.getElementById('case-prioritization')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+      return
+    }
+
+    setActiveSection(sectionId)
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const recommendation = result?.final_recommendation
   const actionClass = recommendation?.action.toLowerCase().replaceAll('_', '-')
 
@@ -3948,15 +4020,30 @@ function App() {
         </div>
 
         <div className="side-label">WORKSPACE</div>
-        <div className="nav-item active">
+        <button
+          className={`nav-item ${activeSection === 'case-prioritization' ? 'active' : ''}`}
+          type="button"
+          onClick={() => navigateTo('case-prioritization')}
+          aria-current={activeSection === 'case-prioritization' ? 'location' : undefined}
+        >
           <span>▦</span> Case prioritization
-        </div>
-        <div className="nav-item">
+        </button>
+        <button
+          className={`nav-item ${activeSection === 'agent-workflow' ? 'active' : ''}`}
+          type="button"
+          onClick={() => navigateTo('agent-workflow')}
+          aria-current={activeSection === 'agent-workflow' ? 'location' : undefined}
+        >
           <span>◎</span> Agent workflow
-        </div>
-        <div className="nav-item">
+        </button>
+        <button
+          className={`nav-item ${activeSection === 'audit-evidence' ? 'active' : ''}`}
+          type="button"
+          onClick={() => navigateTo('audit-evidence')}
+          aria-current={activeSection === 'audit-evidence' ? 'location' : undefined}
+        >
           <span>◷</span> Audit evidence
-        </div>
+        </button>
 
         <div className="sidebar-bottom">
           <div className="status-dot" />
@@ -3998,7 +4085,7 @@ function App() {
         </section>
 
         <div className="workspace-grid">
-          <section className="panel input-panel">
+          <section className="panel input-panel" id="case-prioritization">
             <div className="panel-heading">
               <div>
                 <span className="section-kicker">01 / CASE INTAKE</span>
@@ -4112,6 +4199,28 @@ function App() {
                       )
                     }
                   />
+                </div>
+                <div className="form-field full-width">
+                  <label htmlFor="recent-activity">RECENT ACTIVITY INDICATORS</label>
+                  <textarea
+                    id="recent-activity"
+                    rows={3}
+                    value={caseData.recent_activity_indicators.join('\n')}
+                    placeholder={'Example:\nAttended support session\nSubmitted coursework'}
+                    onChange={(e) =>
+                      updateField(
+                        'recent_activity_indicators',
+                        e.target.value
+                          .split(/[\n,]+/)
+                          .map((item) => item.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                  />
+                  <p className="form-note">
+                    Optional. Enter one indicator per line or separate indicators with commas.
+                    These are included in the case evidence; they do not independently change scoring.
+                  </p>
                 </div>
               </div>
 
@@ -4286,9 +4395,25 @@ function App() {
 
         {error && <div className="error-banner">Request error: {error}</div>}
 
+        {!result && (
+          <>
+            <section className="panel agents-panel" id="agent-workflow">
+              <span className="section-kicker">03 / EXECUTION TRACE</span>
+              <h2>Agent workflow</h2>
+              <p>Run a case to view the five-agent execution trace and each agent's results.</p>
+            </section>
+
+            <section className="panel audit-panel" id="audit-evidence">
+              <span className="section-kicker">05 / AUDITABILITY</span>
+              <h2>Audit evidence</h2>
+              <p>Run a case to generate an audit reference and retrieve its evidence record.</p>
+            </section>
+          </>
+        )}
+
         {result && (
           <>
-            <section className="panel agents-panel">
+            <section className="panel agents-panel" id="agent-workflow">
               <div className="panel-heading">
                 <div>
                   <span className="section-kicker">03 / EXECUTION TRACE</span>
@@ -4364,7 +4489,7 @@ function App() {
                 )}
               </div>
 
-              <div className="panel audit-panel">
+              <div className="panel audit-panel" id="audit-evidence">
                 <span className="section-kicker">05 / AUDITABILITY</span>
                 <h2>Audit record</h2>
                 <p className="audit-reference">{result.audit_reference}</p>
@@ -4411,7 +4536,7 @@ export default App
 <file path="README.md">
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 1.3 — Dockerized Local Deployment & Validation**
+**RealRails Agentic AI Batch 2 | Phase 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation**
 
 ## 1. Project Overview
 
@@ -4424,6 +4549,7 @@ The system evaluates approved academic-support indicators, including:
 - Student engagement status
 - Days since last activity
 - Unresolved support tickets
+- Optional recent activity indicators (included as case evidence; not independently scored)
 
 It generates an explainable recommendation, priority score, supporting evidence, and audit record.
 
@@ -4657,7 +4783,63 @@ Potential future enhancements include:
 **Case ID:** AA004
 **Product:** Student Support Case Prioritization
 **Domain:** Education Operations
-**Phase:** 1.3 — Dockerized Local Deployment & Validation
+**Phase:** 1.4 — Cloud Deployment, Workflow Evidence & Regression Validation
+
+
+## Phase 1.4 Deployment
+
+- Frontend: https://aa-004-student-support-prioritizati.vercel.app/
+- Backend health: https://aa004-student-support-prioritization.onrender.com/health
+
+The Render free instance may take time to wake after inactivity.
+Audit records are held in backend memory and are not retained after a backend restart.
 </file>
 
 </files>
+
+
+<git_logs>
+<git_log_commit>
+<date>2026-11-09 16:57:53 +0530</date>
+<message>feat(AA004): complete Phase 1.4 cloud workflow hardening</message>
+<files>
+README.md
+docs/04_Workflow_Shared_Context_Explainability_Guide.md
+docs/AA004_Implementation_Plan.md
+frontend/src/App.css
+frontend/src/App.tsx
+</files>
+</git_log_commit>
+<git_log_commit>
+<date>2026-11-08 19:19:52 +0530</date>
+<message>chore(AA004): move Repomix into Phase 1.4 evidence</message>
+<files>
+repomix-output.xml
+</files>
+</git_log_commit>
+<git_log_commit>
+<date>2026-11-08 19:18:39 +0530</date>
+<message>docs(AA004): add Phase 1.4 Repomix evidence</message>
+<files>
+evidence/Phase-1.4/repomix-output.xml
+</files>
+</git_log_commit>
+<git_log_commit>
+<date>2026-11-08 19:14:09 +0530</date>
+<message>docs(AA004): add Phase 1.4 deployment evidence and latest repomix</message>
+<files>
+evidence/Phase-1.4/01-Live-Dashboard.png
+evidence/Phase-1.4/02-Workflow-Execution.png
+evidence/Phase-1.4/03-Agent-Execution.png
+evidence/Phase-1.4/04-Audit-Evidence.png
+repomix-output.xml
+</files>
+</git_log_commit>
+<git_log_commit>
+<date>2026-11-08 14:44:21 +0530</date>
+<message>chore(AA004): update dashboard for Phase 1.4 cloud deployment</message>
+<files>
+frontend/src/App.tsx
+</files>
+</git_log_commit>
+</git_logs>
