@@ -95,9 +95,11 @@ evidence/
     Screenshot 2026-11-08 at 13.31.59.png
   Phase-1.4/
     01-Live-Dashboard.png
-    02-Workflow-Execution.png
+    02-Workflow-Context.png
     03-Agent-Execution.png
-    04-Audit-Evidence.png
+    04-Audit-Evidence-Normal.png
+    05-Scenario-Priority-Outreach.png
+    06-Audit-Evidence-Priority-Outreach.png
   01-Dashboard.png
   02-Successful-Workflow.png
   03-Audit-Evidence.png
@@ -4800,6 +4802,21 @@ Audit records are held in backend memory and are not retained after a backend re
 
 <git_logs>
 <git_log_commit>
+<date>2026-11-09 17:17:22 +0530</date>
+<message>docs(AA004): refresh Phase 1.4 submission evidence</message>
+<files>
+evidence/Phase-1.4/01-Live-Dashboard.png
+evidence/Phase-1.4/02-Workflow-Context.png
+evidence/Phase-1.4/02-Workflow-Execution.png
+evidence/Phase-1.4/03-Agent-Execution.png
+evidence/Phase-1.4/04-Audit-Evidence-Normal.png
+evidence/Phase-1.4/04-Audit-Evidence.png
+evidence/Phase-1.4/05-Scenario-Priority-Outreach.png
+evidence/Phase-1.4/06-Audit-Evidence-Priority-Outreach.png
+evidence/Phase-1.4/repomix-output.xml
+</files>
+</git_log_commit>
+<git_log_commit>
 <date>2026-11-09 16:57:53 +0530</date>
 <message>feat(AA004): complete Phase 1.4 cloud workflow hardening</message>
 <files>
@@ -4833,13 +4850,6 @@ evidence/Phase-1.4/02-Workflow-Execution.png
 evidence/Phase-1.4/03-Agent-Execution.png
 evidence/Phase-1.4/04-Audit-Evidence.png
 repomix-output.xml
-</files>
-</git_log_commit>
-<git_log_commit>
-<date>2026-11-08 14:44:21 +0530</date>
-<message>chore(AA004): update dashboard for Phase 1.4 cloud deployment</message>
-<files>
-frontend/src/App.tsx
 </files>
 </git_log_commit>
 </git_logs>
