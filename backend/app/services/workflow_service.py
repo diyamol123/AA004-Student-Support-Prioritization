@@ -18,7 +18,7 @@ AGENT_SEQUENCE = [
 def run_student_support_workflow(
     student_case: StudentCaseInput,
 ) -> WorkflowContext:
-    """Execute the linear graph and return its completed workflow context."""
+    """Execute the conditional LangGraph workflow and return its completed context."""
 
     workflow_id = str(uuid4())
 

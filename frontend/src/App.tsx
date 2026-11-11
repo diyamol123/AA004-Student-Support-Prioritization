@@ -261,8 +261,8 @@ function App() {
         <div className="sidebar-bottom">
           <div className="status-dot" />
           <div>
-            <strong>LangGraph Linear Orchestration</strong>
-            <span>Phase 2.1 · LangGraph workflow</span>
+            <strong>LangGraph Conditional Orchestration</strong>
+            <span>Phase 2.2 · Conditional LangGraph workflow</span>
           </div>
         </div>
       </aside>
@@ -282,8 +282,8 @@ function App() {
         <section className="overview-grid">
           <div className="overview-card">
             <span className="metric-label">WORKFLOW</span>
-            <strong>7 graph nodes</strong>
-            <small>5 agents · 7 execution nodes</small>
+            <strong>8 execution steps</strong>
+            <small>5 agents · 1 selected route · explanation + audit</small>
           </div>
           <div className="overview-card">
             <span className="metric-label">DECISION MODEL</span>
@@ -631,15 +631,15 @@ function App() {
                 <div>
                   <span className="section-kicker">03 / EXECUTION TRACE</span>
                   <h2>Agent workflow</h2>
-                  <p>Seven-node LangGraph execution trace and actual agent outputs returned by the backend.</p>
+                  <p>Conditional LangGraph execution trace and actual agent outputs returned by the backend.</p>
                 </div>
                 <span className="count-tag">{result.agent_outputs.length} agents</span>
               </div>
 
               <div className="graph-trace">
                 <div className="graph-trace-heading">
-                  <strong>LangGraph linear execution</strong>
-                  <span>{result.node_trace?.length ?? 0} / 7 nodes completed</span>
+                  <strong>LangGraph conditional execution</strong>
+                  <span>{result.node_trace?.length ?? 0} / 8 execution steps completed</span>
                 </div>
                 {result.node_trace?.length ? (
                   <ol className="graph-node-list">
@@ -758,7 +758,7 @@ function App() {
         )}
 
         <footer className="page-footer">
-          AA004 · Student Support Case Prioritization · Phase 2.1 · LangGraph Orchestration
+          AA004 · Student Support Case Prioritization · Phase 2.2 · Conditional LangGraph Orchestration
         </footer>
       </main>
     </div>

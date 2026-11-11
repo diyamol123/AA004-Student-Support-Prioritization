@@ -58,6 +58,7 @@ def test_priority_case_produces_priority_outreach():
         RecommendationAction.PRIORITY_OUTREACH
     )
     assert context.final_recommendation.priority_score == 100
+    assert "Route: HIGH_SUPPORT_NEED" in context.node_trace
     assert (
         "RULE-03-LOW-ATTENDANCE-AND-MISSED-WORK"
         in context.final_recommendation.triggered_rules
@@ -79,6 +80,7 @@ def test_incomplete_case_requests_more_information():
     assert context.final_recommendation.action == (
         RecommendationAction.REQUEST_MORE_INFO
     )
+    assert "Route: INCOMPLETE" in context.node_trace
 
 
 def test_audit_record_contains_actual_execution_evidence():
@@ -144,6 +146,8 @@ def test_conflicting_engagement_evidence_requires_tutor_review():
         "status is active" in evidence.detail
         for evidence in context.final_recommendation.evidence
     )
+    assert "Route: CONFLICTING" in context.node_trace
+    assert "Conditional route selected: CONFLICTING" in context.explanation
 
 
 def test_decision_references_all_four_upstream_agents():
@@ -166,7 +170,7 @@ def test_decision_references_all_four_upstream_agents():
     ]
 
 
-def test_langgraph_executes_all_seven_nodes_and_records_trace():
+def test_langgraph_executes_selected_route_and_records_trace():
     case = StudentCaseInput(
         case_id="CASE-LANGGRAPH-TRACE-001",
         attendance_rate=95,
@@ -184,6 +188,7 @@ def test_langgraph_executes_all_seven_nodes_and_records_trace():
         "Engagement Agent",
         "Support Load Agent",
         "Student Support Decision Agent",
+        "Route: LOW_RISK",
         "Explanation Node",
         "Audit Node",
     ]
@@ -197,3 +202,103 @@ def test_langgraph_executes_all_seven_nodes_and_records_trace():
     assert context.final_recommendation.action == (
         RecommendationAction.NORMAL_FOLLOWUP
     )
+
+
+def test_multiple_moderate_concerns_follow_tutor_review_route():
+    case = StudentCaseInput(
+        case_id="CASE-WORKFLOW-RULE-04",
+        attendance_rate=80,
+        missed_submissions=1,
+        engagement_status="active",
+        days_since_last_activity=2,
+        unresolved_support_tickets=0,
+    )
+
+    context = run_student_support_workflow(case)
+    audit = get_audit_record(context.audit_reference)
+
+    assert context.final_recommendation.action == (
+        RecommendationAction.TUTOR_REVIEW
+    )
+    assert (
+        "RULE-04-MULTIPLE-OR-HIGH-CONCERNS"
+        in context.final_recommendation.triggered_rules
+    )
+    assert "Route: TUTOR_REVIEW" in context.node_trace
+    assert "Conditional route selected: TUTOR_REVIEW" in context.explanation
+    assert audit["node_trace"] == context.node_trace
+
+
+def test_all_five_routes_reach_explanation_and_audit():
+    cases = [
+        (
+            StudentCaseInput(
+                case_id="ROUTE-LOW",
+                attendance_rate=95,
+                missed_submissions=0,
+                engagement_status="active",
+                days_since_last_activity=2,
+                unresolved_support_tickets=0,
+            ),
+            "LOW_RISK",
+        ),
+        (
+            StudentCaseInput(
+                case_id="ROUTE-HIGH",
+                attendance_rate=68,
+                missed_submissions=3,
+                engagement_status="inactive",
+                days_since_last_activity=18,
+                unresolved_support_tickets=2,
+            ),
+            "HIGH_SUPPORT_NEED",
+        ),
+        (
+            StudentCaseInput(
+                case_id="ROUTE-INCOMPLETE",
+                attendance_rate=None,
+                missed_submissions=0,
+                engagement_status="active",
+                days_since_last_activity=2,
+                unresolved_support_tickets=0,
+            ),
+            "INCOMPLETE",
+        ),
+        (
+            StudentCaseInput(
+                case_id="ROUTE-CONFLICTING",
+                attendance_rate=95,
+                missed_submissions=0,
+                engagement_status="active",
+                days_since_last_activity=18,
+                unresolved_support_tickets=0,
+            ),
+            "CONFLICTING",
+        ),
+        (
+            StudentCaseInput(
+                case_id="ROUTE-TUTOR",
+                attendance_rate=80,
+                missed_submissions=1,
+                engagement_status="active",
+                days_since_last_activity=2,
+                unresolved_support_tickets=0,
+            ),
+            "TUTOR_REVIEW",
+        ),
+    ]
+
+    for case, expected_route in cases:
+        context = run_student_support_workflow(case)
+        audit = get_audit_record(context.audit_reference)
+
+        assert f"Route: {expected_route}" in context.node_trace
+        assert context.node_trace[-2:] == [
+            "Explanation Node",
+            "Audit Node",
+        ]
+        assert context.explanation
+        assert f"Conditional route selected: {expected_route}" in context.explanation
+        assert audit is not None
+        assert audit["node_trace"] == context.node_trace
+        assert len(context.agent_outputs) == 5
