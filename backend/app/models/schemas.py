@@ -76,6 +76,26 @@ class FinalRecommendation(BaseModel):
     agent_output_refs: list[str] = Field(default_factory=list)
 
 
+class LLMExplanation(BaseModel):
+    """Validated, non-authoritative AI explanation."""
+
+    summary: str = Field(min_length=1, max_length=500)
+    reasons: list[str] = Field(default_factory=list, max_length=5)
+    confidence_note: str = Field(min_length=1, max_length=300)
+
+
+class LLMTraceMetadata(BaseModel):
+    """Safe metadata describing the optional LLM invocation."""
+
+    llm_used: bool = False
+    provider: str = "gemini"
+    model: str = "gemini-3.8-flash"
+    status: str = "NOT_CONFIGURED"
+    fallback_used: bool = True
+    validation_status: str = "NOT_RUN"
+    error_category: str | None = None
+
+
 class WorkflowContext(BaseModel):
     """Shared context scoped to one workflow execution; not long-term memory."""
 
@@ -89,6 +109,10 @@ class WorkflowContext(BaseModel):
     agent_outputs: list[AgentOutput] = Field(default_factory=list)
     final_recommendation: FinalRecommendation | None = None
     explanation: list[str] = Field(default_factory=list)
+    llm_metadata: LLMTraceMetadata = Field(
+        default_factory=LLMTraceMetadata
+    )
+
     audit_reference: str | None = None
     node_trace: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)

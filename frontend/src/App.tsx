@@ -60,6 +60,15 @@ type WorkflowResult = {
   node_trace?: string[]
   final_recommendation: Recommendation | null
   explanation: string | string[]
+  llm_metadata?: {
+    llm_used: boolean
+    provider: string
+    model: string
+    status: string
+    fallback_used: boolean
+    validation_status: string
+    error_category?: string | null
+  }
   audit_reference: string | null
   errors: string[]
   created_at: string
@@ -262,7 +271,7 @@ function App() {
           <div className="status-dot" />
           <div>
             <strong>LangGraph Conditional Orchestration</strong>
-            <span>Phase 2.2 · Conditional LangGraph workflow</span>
+            <span>Phase 2.3 · Conditional LangGraph workflow</span>
           </div>
         </div>
       </aside>
@@ -722,6 +731,24 @@ function App() {
                 ) : (
                   <p className="explanation-text">{result.explanation || 'No explanation returned.'}</p>
                 )}
+                {result.llm_metadata && (
+                  <div className="llm-status">
+                    <strong>Controlled LLM explanation</strong>
+                    <p>
+                      Provider: {result.llm_metadata.provider} ·
+                      Model: {result.llm_metadata.model}
+                    </p>
+                    <p>
+                      Status: {result.llm_metadata.status} ·
+                      Validation: {result.llm_metadata.validation_status}
+                    </p>
+                    <p>
+                      {result.llm_metadata.fallback_used
+                        ? 'Deterministic fallback used'
+                        : 'Gemini explanation used'}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="panel audit-panel" id="audit-evidence">
@@ -758,7 +785,7 @@ function App() {
         )}
 
         <footer className="page-footer">
-          AA004 · Student Support Case Prioritization · Phase 2.2 · Conditional LangGraph Orchestration
+          AA004 · Student Support Case Prioritization · Phase 2.3 · Conditional LangGraph Orchestration
         </footer>
       </main>
     </div>

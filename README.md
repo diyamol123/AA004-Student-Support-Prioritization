@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 2.2 — LangGraph Conditional Routing**
+**RealRails Agentic AI Batch 2 | Phase 2.3 — Controlled LLM Explanation**
 
 ## 1. Project Overview
 
@@ -101,7 +101,54 @@ END
 
 All five routes converge on the shared Explanation Node and then the Audit Node. The selected route is included in execution tracing, explanation, and audit evidence.
 
-## 5. Recommendation Types
+## 5. Phase 2.3 — Controlled LLM Explanation
+
+Phase 2.3 adds an optional Gemini explanation capability to the existing
+conditional LangGraph workflow.
+
+The deterministic workflow remains the sole authority for scoring,
+prioritization, conditional routing, and recommendations. Gemini explains
+the already-computed result using supplied workflow facts.
+
+### LLM responsibilities and boundaries
+
+- Gemini generates a human-readable explanation only.
+- The deterministic decision agent remains authoritative.
+- Gemini cannot modify priority scores, routes, or recommendations.
+- The explanation service uses structured Pydantic output validation.
+- The case ID and raw activity indicators are not sent to Gemini.
+- Deterministic explanation fallback is used when Gemini is disabled,
+  unavailable, times out, or returns invalid output.
+
+### Conditional workflow routes
+
+| Route | Recommendation |
+|---|---|
+| `LOW_RISK` | `NORMAL_FOLLOWUP` |
+| `HIGH_SUPPORT_NEED` | `PRIORITY_OUTREACH` |
+| `INCOMPLETE` | `REQUEST_MORE_INFO` |
+| `CONFLICTING` | `TUTOR_REVIEW` |
+| `TUTOR_REVIEW` | `TUTOR_REVIEW` |
+
+The selected route is determined before the Explanation Node. All routes
+continue through explanation and audit processing.
+
+### Phase 2.3 verification
+
+- Live Gemini execution completed successfully.
+- Provider: Gemini.
+- Model: `gemini-3.5-flash-lite`.
+- Live response status: `SUCCESS`.
+- Structured response validation: `VALID`.
+- Simulated timeout and deterministic fallback tested.
+- Backend test suite: **53 passed**.
+- Frontend lint and production build results are documented in the
+  Phase 2.3 evidence README.
+
+The LLM is an optional explanation layer. The workflow remains capable of
+producing deterministic explanations without a successful LLM response.
+
+## 6. Recommendation Types
 
 The workflow supports four recommendations:
 
@@ -114,7 +161,7 @@ The workflow supports four recommendations:
 
 The system calculates a priority score and provides reasons, triggered rules, and evidence for its recommendation.
 
-## 6. Technology Stack
+## 7. Technology Stack
 
 **Backend**
 - Python 3.11+
@@ -137,7 +184,7 @@ The system calculates a priority score and provides reasons, triggered rules, an
 - Conditional node execution tracing
 - Audit logging
 
-## 7. Project Structure
+## 8. Project Structure
 
 ```text
 AA004-Student-Support-Prioritization/
@@ -152,7 +199,8 @@ AA004-Student-Support-Prioritization/
 │   └── main.py
 ├── docs/
 ├── evidence/
-│   └── phase-2.2/
+│   ├── phase-2.2/
+│   └── phase-2.3/
 │       ├── README.md
 │       ├── repomix-output.xml
 │       └── Screenshot files (9)
@@ -163,7 +211,7 @@ AA004-Student-Support-Prioritization/
 └── README.md
 ```
 
-## 8. Setup and Execution
+## 9. Setup and Execution
 
 ### Backend
 
@@ -202,7 +250,7 @@ npm run build
 npm run lint
 ```
 
-## 9. API Endpoints
+## 10. API Endpoints
 
 | Method | Endpoint | Purpose |
 |---|---|---|
@@ -210,7 +258,7 @@ npm run lint
 | POST | `/api/workflows/run` | Execute prioritization workflow |
 | GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
 
-## 10. Phase 2.2 Validation Results
+## 11. Phase 2.2 Validation Results
 
 Latest local validation:
 
@@ -225,15 +273,15 @@ Latest local validation:
 - Explanation and audit integration: verified
 - API workflow and audit integration: verified
 
-## 11. Submission Evidence
+## 12. Submission Evidence
 
-Phase 2.2 evidence is available in `evidence/phase-2.2/`.
+Phase 2.2 evidence is available in `evidence/phase-2.2/`. Phase 2.3 evidence is available in `evidence/phase-2.3/`.
 
-See `evidence/phase-2.2/README.md` for the evidence inventory, actual screenshot filenames, execution sequence, and validation details.
+See `evidence/phase-2.2/README.md` for the Phase 2.2 evidence inventory.
 
-The folder also contains `repomix-output.xml`, the Phase 2.2 project snapshot.
+See `evidence/phase-2.3/README.md` for the Phase 2.3 route explanation, screenshot inventory, validation results, and latest Repomix snapshot (`repomix-output.xml`).
 
-## 12. MVP Scope and Limitations
+## 13. MVP Scope and Limitations
 
 This MVP is designed for academic-support prioritization only.
 
@@ -243,7 +291,7 @@ This MVP is designed for academic-support prioritization only.
 - Recommendations support human academic-support staff and do not replace their judgment.
 - Audit records are currently held in backend memory and are not retained after a backend restart.
 
-## 13. Future Improvements
+## 14. Future Improvements
 
 Potential future enhancements include:
 
@@ -252,12 +300,12 @@ Potential future enhancements include:
 - Integration with approved student-support systems.
 - Further workflow orchestration capabilities.
 
-## 14. Project Information
+## 15. Project Information
 
-**Case ID:** AA004  
-**Product:** Student Support Case Prioritization  
-**Domain:** Education Operations  
-**Current implementation:** Phase 2.2 — LangGraph Conditional Routing
+**Case ID:** AA004
+**Product:** Student Support Case Prioritization
+**Domain:** Education Operations
+**Current implementation:** Phase 2.3 — Controlled LLM Explanation
 
 ### Existing Phase 1.4 Deployment
 
@@ -270,4 +318,4 @@ The Render free instance may take time to wake after inactivity.
 
 ---
 
-**Current Status:** Phase 2.2 implementation and local validation completed. Reviewer accepted. Proceeding to Post 2.3 — Controlled LLM Enhancement.
+**Current Status:** Phase 2.2 implementation and local validation completed. Reviewer accepted. Phase 2.3 — Controlled LLM Explanation implementation and local evidence preparation completed. Reviewer approval pending.

@@ -17,6 +17,7 @@ def record_workflow(
     final_recommendation: dict,
     errors: list[str],
     node_trace: list[str] | None = None,
+    llm_metadata: dict | None = None,
 ) -> str:
     """Store a traceable record of one workflow execution."""
 
@@ -33,6 +34,7 @@ def record_workflow(
         "final_recommendation": deepcopy(final_recommendation),
         "errors": list(errors),
         "node_trace": list(node_trace or []),
+        "llm_metadata": deepcopy(llm_metadata or {}),
     }
 
     return audit_reference

@@ -457,3 +457,17 @@
     flex-direction: column;
   }
 }
+
+
+/* Controlled LLM status */
+.llm-status {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--border, #dce2eb);
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.llm-status p {
+  margin: 4px 0 0;
+}

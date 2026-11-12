@@ -15,6 +15,7 @@ from backend.app.models.schemas import (
     WorkflowContext,
 )
 from backend.app.services.audit_service import record_workflow
+from backend.app.services.llm_service import generate_explanation
 
 
 AGENT_SEQUENCE = [
@@ -235,6 +236,8 @@ def tutor_review_route_node(state: StudentSupportGraphState) -> dict:
 
 
 def explanation_node(state: StudentSupportGraphState) -> dict:
+    """Generate a bounded LLM explanation with deterministic fallback."""
+
     context = state["context"]
     recommendation = context.final_recommendation
 
@@ -249,21 +252,53 @@ def explanation_node(state: StudentSupportGraphState) -> dict:
         ),
         None,
     )
+
     if selected_route is None:
         raise ValueError("A conditional route must be selected before Explanation.")
 
-    explanation = [
+    fallback_explanation = [
         f"{output.agent_name}: {output.summary}"
         for output in context.agent_outputs
     ]
-    explanation.append(f"Conditional route selected: {selected_route}")
-    explanation.extend(
+    fallback_explanation.append(
+        f"Conditional route selected: {selected_route}"
+    )
+    fallback_explanation.extend(
         f"Decision rule triggered: {rule}"
         for rule in recommendation.triggered_rules
     )
-    explanation.extend(recommendation.reasons)
+    fallback_explanation.extend(recommendation.reasons)
 
-    updated = context.model_copy(update={"explanation": explanation})
+    facts = [
+        f"Recommendation action: {recommendation.action.value}",
+        f"Priority score: {recommendation.priority_score}",
+        f"Priority band: {recommendation.priority_band}",
+        f"Selected route: {selected_route}",
+        *[
+            f"Triggered rule: {rule}"
+            for rule in recommendation.triggered_rules
+        ],
+        *[
+            f"Existing reason: {reason}"
+            for reason in recommendation.reasons
+        ],
+        *[
+            f"{output.agent_name}: {output.summary}"
+            for output in context.agent_outputs
+        ],
+    ]
+
+    explanation, metadata = generate_explanation(
+        facts=facts,
+        fallback_explanation=fallback_explanation,
+    )
+
+    updated = context.model_copy(
+        update={
+            "explanation": explanation,
+            "llm_metadata": metadata,
+        }
+    )
     return _with_trace(state, updated, "Explanation Node")
 
 
@@ -289,6 +324,7 @@ def audit_node(state: StudentSupportGraphState) -> dict:
         final_recommendation=recommendation.model_dump(mode="json"),
         errors=context.errors,
         node_trace=context.node_trace,
+        llm_metadata=context.llm_metadata.model_dump(mode="json"),
     )
 
     completed = context.model_copy(
