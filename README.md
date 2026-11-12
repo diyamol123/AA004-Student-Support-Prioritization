@@ -35,11 +35,11 @@ The application uses five specialized deterministic agents:
 4. **Support Load Agent** — evaluates missed submissions and unresolved support tickets.
 5. **Student Support Decision Agent** — combines agent outputs and deterministic rules to generate the final recommendation.
 
-The five agents are orchestrated through a compiled LangGraph StateGraph with deterministic conditional routing.
+The five agents are orchestrated through a compiled conditional LangGraph StateGraph with deterministic routing.
 
 ## 4. Phase 2.2 — LangGraph Conditional Routing
 
-Phase 2.2 extends the Phase 2.1 linear LangGraph workflow by introducing deterministic conditional routing after the Student Support Decision Agent. Existing agents, decision logic, and recommendation behavior remain unchanged.
+Phase 2.2 extends the Phase 2.1 sequential LangGraph workflow by introducing deterministic conditional routing after the Student Support Decision Agent. Existing agents, decision logic, and recommendation behavior remain unchanged.
 
 ### Eight-step conditional execution sequence
 
@@ -62,10 +62,15 @@ START
 5. Student Support Decision Agent
   |
   v
-6. Explanation Node
+6. Selected Route Node
+   (LOW_RISK / HIGH_SUPPORT_NEED / INCOMPLETE /
+    CONFLICTING / TUTOR_REVIEW)
   |
   v
-7. Audit Node
+7. Explanation Node
+  |
+  v
+8. Audit Node
   |
   v
 END
@@ -73,7 +78,7 @@ END
 
 ### Phase 2.2 implementation
 
-- Replaced sequential orchestration with a compiled LangGraph StateGraph.
+- Replaced sequential orchestration with a compiled conditional LangGraph StateGraph.
 - Mapped the existing run-scoped WorkflowContext into shared graph state.
 - Reused all five existing deterministic agents.
 - Preserved the existing decision logic and recommendation outcomes.
@@ -126,10 +131,10 @@ The system calculates a priority score and provides reasons, triggered rules, an
 
 **Workflow**
 - Deterministic multi-agent execution
-- LangGraph linear StateGraph
+- Conditional LangGraph StateGraph
 - Shared workflow context
 - Rule-based prioritization
-- Node execution tracing
+- Conditional node execution tracing
 - Audit logging
 
 ## 7. Project Structure
@@ -147,11 +152,10 @@ AA004-Student-Support-Prioritization/
 │   └── main.py
 ├── docs/
 ├── evidence/
-│   ├── Phase-1.4/
-│   └── Phase-2.1/
+│   └── phase-2.2/
 │       ├── README.md
 │       ├── repomix-output.xml
-│       └── screenshots/
+│       └── Screenshot files (9)
 ├── frontend/
 │   ├── src/
 │   └── package.json
@@ -223,14 +227,11 @@ Latest local validation:
 
 ## 11. Submission Evidence
 
-Phase 2.2 evidence is available in `evidence/phase-2.2/`:
+Phase 2.2 evidence is available in `evidence/phase-2.2/`.
 
-- `README.md` — Component mapping, execution order, changes, and validation.
-- `01-working-dashboard.png` — Working application.
-- `02-langgraph-execution.png` — Seven-node execution trace.
-- `03-workflow-state.png` — Workflow state.
-- `04-explanation-audit.png` — Explanation and audit results.
-- `repomix-output.xml` — Latest regenerated project snapshot.
+See `evidence/phase-2.2/README.md` for the evidence inventory, actual screenshot filenames, execution sequence, and validation details.
+
+The folder also contains `repomix-output.xml`, the Phase 2.2 project snapshot.
 
 ## 12. MVP Scope and Limitations
 
@@ -246,7 +247,6 @@ This MVP is designed for academic-support prioritization only.
 
 Potential future enhancements include:
 
-- Deterministic conditional workflow routing.
 - Configurable institutional prioritization thresholds.
 - Expanded audit and reporting capabilities.
 - Integration with approved student-support systems.
