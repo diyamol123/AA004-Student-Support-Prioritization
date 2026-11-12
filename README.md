@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 2.1 — LangGraph Linear Orchestration**
+**RealRails Agentic AI Batch 2 | Phase 2.2 — LangGraph Conditional Routing**
 
 ## 1. Project Overview
 
@@ -35,13 +35,13 @@ The application uses five specialized deterministic agents:
 4. **Support Load Agent** — evaluates missed submissions and unresolved support tickets.
 5. **Student Support Decision Agent** — combines agent outputs and deterministic rules to generate the final recommendation.
 
-The five agents are orchestrated through a compiled LangGraph linear StateGraph.
+The five agents are orchestrated through a compiled LangGraph StateGraph with deterministic conditional routing.
 
-## 4. Phase 2.1 — LangGraph Linear Orchestration
+## 4. Phase 2.2 — LangGraph Conditional Routing
 
-The original sequential workflow orchestration has been migrated to LangGraph while preserving the existing deterministic business rules, agent responsibilities, decision logic, and recommendation behavior.
+Phase 2.2 extends the Phase 2.1 linear LangGraph workflow by introducing deterministic conditional routing after the Student Support Decision Agent. Existing agents, decision logic, and recommendation behavior remain unchanged.
 
-### Seven-node execution sequence
+### Eight-step conditional execution sequence
 
 ```text
 START
@@ -71,18 +71,30 @@ START
 END
 ```
 
-### Phase 2.1 implementation
+### Phase 2.2 implementation
 
 - Replaced sequential orchestration with a compiled LangGraph StateGraph.
 - Mapped the existing run-scoped WorkflowContext into shared graph state.
 - Reused all five existing deterministic agents.
 - Preserved the existing decision logic and recommendation outcomes.
-- Added seven-node execution tracing.
+- Added eight-step conditional execution tracing.
 - Integrated node trace information into workflow results and audit records.
 - Displayed actual graph execution progress in the frontend dashboard.
 - Preserved existing API endpoints and frontend functionality.
 
-**Scope:** Linear orchestration only. No conditional routing, LLM, RAG, vector database, or MCP was introduced in Phase 2.1.
+**Scope:** Deterministic conditional routing only. No LLM, RAG, vector database, or MCP was introduced in Phase 2.2.
+
+### Route-to-recommendation mapping
+
+| Conditional route | Recommendation |
+|---|---|
+| `LOW_RISK` | `NORMAL_FOLLOWUP` |
+| `HIGH_SUPPORT_NEED` | `PRIORITY_OUTREACH` |
+| `INCOMPLETE` | `REQUEST_MORE_INFO` |
+| `CONFLICTING` | `TUTOR_REVIEW` |
+| `TUTOR_REVIEW` | `TUTOR_REVIEW` |
+
+All five routes converge on the shared Explanation Node and then the Audit Node. The selected route is included in execution tracing, explanation, and audit evidence.
 
 ## 5. Recommendation Types
 
@@ -194,15 +206,15 @@ npm run lint
 | POST | `/api/workflows/run` | Execute prioritization workflow |
 | GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
 
-## 10. Phase 2.1 Validation Results
+## 10. Phase 2.2 Validation Results
 
 Latest local validation:
 
-- Backend tests: **46 passed**
+- Backend tests: **48 passed**
 - Frontend production build: passed
 - Frontend ESLint: passed
-- Four Product Bible scenarios: tested successfully
-- LangGraph graph compilation and seven-node execution: verified
+- Five conditional routing scenarios — normal, priority, incomplete, conflicting, and tutor review — tested successfully
+- LangGraph graph compilation and eight-step conditional execution: verified
 - Expected node execution order: verified
 - Workflow state and node trace: verified
 - Recommendation and deterministic decision behavior: preserved
@@ -211,7 +223,7 @@ Latest local validation:
 
 ## 11. Submission Evidence
 
-Phase 2.1 evidence is available in `evidence/Phase-2.1/`:
+Phase 2.2 evidence is available in `evidence/phase-2.2/`:
 
 - `README.md` — Component mapping, execution order, changes, and validation.
 - `01-working-dashboard.png` — Working application.
@@ -245,11 +257,11 @@ Potential future enhancements include:
 **Case ID:** AA004  
 **Product:** Student Support Case Prioritization  
 **Domain:** Education Operations  
-**Current implementation:** Phase 2.1 — LangGraph Linear Orchestration
+**Current implementation:** Phase 2.2 — LangGraph Conditional Routing
 
 ### Existing Phase 1.4 Deployment
 
-The following deployment remains the Phase 1.4 cloud version. Phase 2.1 has been committed and pushed to GitHub but has not been deployed.
+The following deployment remains the Phase 1.4 cloud version. Phase 2.2 has been committed and pushed to GitHub but has not been deployed.
 
 - Frontend: https://aa-004-student-support-prioritizati.vercel.app/
 - Backend health: https://aa004-student-support-prioritization.onrender.com/health
@@ -258,4 +270,4 @@ The Render free instance may take time to wake after inactivity.
 
 ---
 
-**Current Status:** Phase 2.1 implementation and local validation completed. Awaiting reviewer acceptance.
+**Current Status:** Phase 2.2 implementation and local validation completed. Reviewer accepted. Proceeding to Post 2.3 — Controlled LLM Enhancement.
