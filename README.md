@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 2.3 — Controlled LLM Explanation**
+**RealRails Agentic AI Batch 2 | Phase 3.1 — Productized Business Experience**
 
 ## 1. Project Overview
 
@@ -148,7 +148,39 @@ continue through explanation and audit processing.
 The LLM is an optional explanation layer. The workflow remains capable of
 producing deterministic explanations without a successful LLM response.
 
-## 6. Recommendation Types
+## 6. Phase 3.1 — Productized Business Experience
+
+Phase 3.1 improves the application experience for academic support teams while preserving the existing Phase 2.3 agentic AI backend.
+
+### Business-facing workspace
+
+- Introduced Student Support Workspace as the primary user experience.
+- Improved navigation and labels to use clear business terminology.
+- Presented recommendations with priority scores, reasons, and supporting evidence.
+- Added suggested next steps based on the existing recommendation.
+- Made human review explicit before support actions are taken.
+- Improved evidence labels and descriptions for easier understanding.
+- Improved the interface for responsive, narrow-screen use.
+
+### Technical review access
+
+Explainability & Audit remains available through a separate advanced review area. It provides access to workflow execution, agent outputs, technical evidence, and audit details without making these internal details part of the normal business workflow.
+
+### Preserved architecture
+
+- Existing deterministic decision rules and recommendation logic remain unchanged.
+- Existing five-agent LangGraph workflow and conditional routing are preserved.
+- Gemini remains an explanation layer, not the decision authority.
+- No new backend decision logic was introduced for this productization phase.
+
+### Phase 3.1 evidence
+
+- Application screenshots: `evidence/phase-3.1/screenshots/`
+- Latest repository snapshot: `evidence/phase-3.1/repomix-output.xml`
+
+---
+
+## 7. Recommendation Types
 
 The workflow supports four recommendations:
 
@@ -161,7 +193,7 @@ The workflow supports four recommendations:
 
 The system calculates a priority score and provides reasons, triggered rules, and evidence for its recommendation.
 
-## 7. Technology Stack
+## 8. Technology Stack
 
 **Backend**
 - Python 3.11+
@@ -184,7 +216,7 @@ The system calculates a priority score and provides reasons, triggered rules, an
 - Conditional node execution tracing
 - Audit logging
 
-## 8. Project Structure
+## 9. Project Structure
 
 ```text
 AA004-Student-Support-Prioritization/
@@ -200,10 +232,13 @@ AA004-Student-Support-Prioritization/
 ├── docs/
 ├── evidence/
 │   ├── phase-2.2/
-│   └── phase-2.3/
-│       ├── README.md
+│   ├── phase-2.3/
+│   │   ├── README.md
+│   │   ├── repomix-output.xml
+│   │   └── Screenshot files (9)
+│   └── phase-3.1/
 │       ├── repomix-output.xml
-│       └── Screenshot files (9)
+│       └── screenshots/
 ├── frontend/
 │   ├── src/
 │   └── package.json
@@ -211,7 +246,7 @@ AA004-Student-Support-Prioritization/
 └── README.md
 ```
 
-## 9. Setup and Execution
+## 10. Setup and Execution
 
 ### Backend
 

@@ -471,3 +471,123 @@
 .llm-status p {
   margin: 4px 0 0;
 }
+
+/* Phase 3.1 — Human-led next-step guidance */
+.next-step-section {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #dcdaf8;
+  border-left: 4px solid #6c63e9;
+  border-radius: 10px;
+  background: #f7f6ff;
+}
+
+.next-step-section h4 {
+  margin-bottom: 8px;
+  color: #383477;
+}
+
+.next-step-section p {
+  margin: 0;
+  color: #26334b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.next-step-section small {
+  display: block;
+  margin-top: 9px;
+  color: #686b7d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Phase 3.1 — Supporting evidence */
+.evidence-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evidence-list li {
+  padding: 12px 14px;
+  border: 1px solid #e1e5ed;
+  border-radius: 9px;
+  background: #fbfcfe;
+}
+
+.evidence-list li strong {
+  display: block;
+  color: #343d55;
+  font-size: 12px;
+}
+
+.evidence-list li p {
+  margin: 5px 0 0;
+  color: #596276;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.evidence-list li small {
+  display: block;
+  margin-top: 6px;
+  color: #737b8d;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+/* Phase 3.1 — Advanced Explainability & Audit workspace */
+.technical-workspace {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #e1e5ef;
+  border-radius: 14px;
+  background: #f5f6fb;
+}
+
+.technical-workspace-heading {
+  padding: 2px 2px 8px;
+}
+
+.technical-workspace-heading h2 {
+  margin: 7px 0;
+  color: #202b42;
+  font-size: 20px;
+}
+
+.technical-workspace-heading p {
+  margin: 0;
+  color: #69748a;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.technical-workspace > .panel {
+  margin-top: 0;
+}
+
+.technical-workspace .lower-grid {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .technical-workspace {
+    gap: 13px;
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 11px;
+  }
+
+  .technical-workspace-heading h2 {
+    font-size: 18px;
+  }
+
+  .technical-workspace-heading p {
+    font-size: 11px;
+  }
+}
