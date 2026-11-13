@@ -10,7 +10,7 @@ def setup_function():
     import os
     os.environ["LLM_ENABLED"] = "true"
     os.environ["LLM_PROVIDER"] = "gemini"
-    os.environ["LLM_MODEL"] = "gemini-3.8-flash"
+    os.environ["LLM_MODEL"] = "gemini-3.5-flash-lite"
     os.environ["GEMINI_API_KEY"] = "test-key"
 
 

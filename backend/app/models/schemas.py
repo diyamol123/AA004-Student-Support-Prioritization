@@ -89,7 +89,7 @@ class LLMTraceMetadata(BaseModel):
 
     llm_used: bool = False
     provider: str = "gemini"
-    model: str = "gemini-3.8-flash"
+    model: str = "gemini-3.5-flash-lite"
     status: str = "NOT_CONFIGURED"
     fallback_used: bool = True
     validation_status: str = "NOT_RUN"

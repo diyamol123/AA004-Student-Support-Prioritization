@@ -23,7 +23,7 @@ def _invoke_gemini(facts: list[str]) -> LLMExplanation:
     if not api_key:
         raise RuntimeError("MISSING_API_KEY")
 
-    model = os.getenv("LLM_MODEL", "gemini-3.8-flash")
+    model = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
     timeout = int(os.getenv("LLM_TIMEOUT", "12"))
 
     client = genai.Client(
@@ -69,7 +69,7 @@ def generate_explanation(
     """Use Gemini when available; otherwise preserve deterministic output."""
 
     provider = os.getenv("LLM_PROVIDER", "gemini")
-    model = os.getenv("LLM_MODEL", "gemini-3.8-flash")
+    model = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
     enabled = os.getenv("LLM_ENABLED", "false").lower() in {
         "true",
         "1",

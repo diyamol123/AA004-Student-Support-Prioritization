@@ -307,15 +307,17 @@ Potential future enhancements include:
 **Domain:** Education Operations
 **Current implementation:** Phase 2.3 — Controlled LLM Explanation
 
-### Existing Phase 1.4 Deployment
+### Phase 2.3 Production Deployment
 
-The following deployment remains the Phase 1.4 cloud version. Phase 2.2 has been committed and pushed to GitHub but has not been deployed.
+The current cloud deployment runs the accepted Phase 2.3 — Controlled LLM Explanation implementation.
 
-- Frontend: https://aa-004-student-support-prioritizati.vercel.app/
-- Backend health: https://aa004-student-support-prioritization.onrender.com/health
+- Frontend — Vercel: https://aa-004-student-support-prioritization-1zcj9gqb0-diyamol123.vercel.app/
+- Backend health — Render: https://aa004-student-support-prioritization.onrender.com/health
+
+The production deployment was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
 
 The Render free instance may take time to wake after inactivity.
 
 ---
 
-**Current Status:** Phase 2.2 implementation and local validation completed. Reviewer accepted. Phase 2.3 — Controlled LLM Explanation implementation and local evidence preparation completed. Reviewer approval pending.
+**Current Status:** Phase 2.3 — Controlled LLM Explanation implemented, deployed, tested, and accepted by the reviewer. The core RealRails Agentic AI Batch 2 journey is complete. Optional Phase 3 — Productization is available as the next stage.
