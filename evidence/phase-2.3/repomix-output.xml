@@ -168,431 +168,6 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
-<file path="backend/app/services/llm_service.py">
-"""Controlled Gemini explanation service with deterministic fallback."""
-
-import os
-from pathlib import Path
-
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-from pydantic import ValidationError
-
-from backend.app.models.schemas import (
-    LLMExplanation,
-    LLMTraceMetadata,
-)
-
-load_dotenv(dotenv_path=Path.cwd() / ".env")
-
-
-def _invoke_gemini(facts: list[str]) -> LLMExplanation:
-    """Generate a structured explanation using only supplied facts."""
-
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("MISSING_API_KEY")
-
-    model = os.getenv("LLM_MODEL", "gemini-3.8-flash")
-    timeout = int(os.getenv("LLM_TIMEOUT", "12"))
-
-    client = genai.Client(
-        api_key=api_key,
-        http_options=types.HttpOptions(timeout=timeout * 1000),
-    )
-
-    prompt = f"""
-You are an explanation assistant for a student support workflow.
-
-Your ONLY task is to explain an existing deterministic recommendation.
-
-Rules:
-- Use only the supplied facts.
-- Do not change scores, priority, decisions, or recommendations.
-- Do not invent evidence or student information.
-- Do not make a new support decision.
-- Keep the explanation concise and factual.
-
-Supplied facts:
-{facts}
-"""
-
-    response = client.models.generate_content(
-        model=model,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=LLMExplanation,
-        ),
-    )
-
-    if not response.text:
-        raise ValueError("Empty model response")
-
-    return LLMExplanation.model_validate_json(response.text)
-
-
-def generate_explanation(
-    facts: list[str],
-    fallback_explanation: list[str],
-) -> tuple[list[str], LLMTraceMetadata]:
-    """Use Gemini when available; otherwise preserve deterministic output."""
-
-    provider = os.getenv("LLM_PROVIDER", "gemini")
-    model = os.getenv("LLM_MODEL", "gemini-3.8-flash")
-    enabled = os.getenv("LLM_ENABLED", "false").lower() in {
-        "true",
-        "1",
-        "yes",
-    }
-
-    def fallback(status: str, error: str | None = None):
-        return fallback_explanation, LLMTraceMetadata(
-            llm_used=False,
-            provider=provider,
-            model=model,
-            status=status,
-            fallback_used=True,
-            validation_status="FAILED" if error else "NOT_RUN",
-            error_category=error,
-        )
-
-    if not enabled:
-        return fallback("DISABLED")
-
-    if provider != "gemini":
-        return fallback("UNSUPPORTED_PROVIDER", "ConfigurationError")
-
-    if not os.getenv("GEMINI_API_KEY"):
-        return fallback("MISSING_API_KEY", "ConfigurationError")
-
-    try:
-        result = _invoke_gemini(facts)
-
-        return (
-            [
-                result.summary,
-                *result.reasons,
-                result.confidence_note,
-            ],
-            LLMTraceMetadata(
-                llm_used=True,
-                provider=provider,
-                model=model,
-                status="SUCCESS",
-                fallback_used=False,
-                validation_status="VALID",
-            ),
-        )
-
-    except ValidationError:
-        return fallback("INVALID_OUTPUT", "ValidationError")
-
-    except Exception as exc:
-        error_name = type(exc).__name__
-        error_message = str(exc).upper()
-
-        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
-            return fallback("QUOTA_EXCEEDED", "QuotaExceeded")
-
-        if "TIMEOUT" in error_name.upper():
-            return fallback("TIMEOUT", "TimeoutError")
-
-        return fallback("ERROR", error_name)
-</file>
-
-<file path="backend/tests/conftest.py">
-"""Prevent real Gemini requests during general workflow tests."""
-
-import pytest
-
-from backend.app.graphs import student_support_graph as graph_module
-from backend.app.models.schemas import LLMTraceMetadata
-
-
-@pytest.fixture(autouse=True)
-def mock_llm_for_workflow_tests(monkeypatch):
-    def deterministic_fallback(facts, fallback_explanation):
-        return fallback_explanation, LLMTraceMetadata(
-            llm_used=False,
-            status="TEST_FALLBACK",
-            fallback_used=True,
-            validation_status="NOT_RUN",
-        )
-
-    monkeypatch.setattr(
-        graph_module,
-        "generate_explanation",
-        deterministic_fallback,
-    )
-</file>
-
-<file path="backend/tests/test_llm_service.py">
-"""Evaluation tests for the controlled Gemini explanation service."""
-
-from pydantic import ValidationError
-
-from backend.app.models.schemas import LLMExplanation
-from backend.app.services import llm_service
-
-
-def setup_function():
-    import os
-    os.environ["LLM_ENABLED"] = "true"
-    os.environ["LLM_PROVIDER"] = "gemini"
-    os.environ["LLM_MODEL"] = "gemini-3.8-flash"
-    os.environ["GEMINI_API_KEY"] = "test-key"
-
-
-def test_valid_gemini_response(monkeypatch):
-    monkeypatch.setattr(
-        llm_service,
-        "_invoke_gemini",
-        lambda facts: LLMExplanation(
-            summary="The existing recommendation is supported.",
-            reasons=["Attendance evidence supports the decision."],
-            confidence_note="Based only on supplied evidence.",
-        ),
-    )
-
-    explanation, metadata = llm_service.generate_explanation(
-        ["Priority score: 80"],
-        ["Deterministic fallback"],
-    )
-
-    assert explanation[0] == "The existing recommendation is supported."
-    assert metadata.llm_used is True
-    assert metadata.fallback_used is False
-    assert metadata.validation_status == "VALID"
-
-
-def test_ambiguous_input_is_passed_as_facts(monkeypatch):
-    received = []
-
-    def fake_invoke(facts):
-        received.extend(facts)
-        return LLMExplanation(
-            summary="The available evidence is limited.",
-            reasons=["Some information is unclear."],
-            confidence_note="No additional facts were assumed.",
-        )
-
-    monkeypatch.setattr(llm_service, "_invoke_gemini", fake_invoke)
-
-    explanation, metadata = llm_service.generate_explanation(
-        ["Attendance evidence is incomplete"],
-        ["Deterministic fallback"],
-    )
-
-    assert received == ["Attendance evidence is incomplete"]
-    assert metadata.llm_used is True
-    assert "limited" in explanation[0]
-
-
-def test_timeout_uses_deterministic_fallback(monkeypatch):
-    def timeout(_facts):
-        raise TimeoutError("Simulated timeout")
-
-    monkeypatch.setattr(llm_service, "_invoke_gemini", timeout)
-
-    explanation, metadata = llm_service.generate_explanation(
-        ["Priority score: 90"],
-        ["Original deterministic explanation"],
-    )
-
-    assert explanation == ["Original deterministic explanation"]
-    assert metadata.status == "TIMEOUT"
-    assert metadata.fallback_used is True
-
-
-def test_invalid_output_uses_deterministic_fallback(monkeypatch):
-    def invalid(_facts):
-        return LLMExplanation.model_validate({
-            "summary": "",
-            "reasons": [],
-            "confidence_note": "Invalid summary",
-        })
-
-    monkeypatch.setattr(llm_service, "_invoke_gemini", invalid)
-
-    explanation, metadata = llm_service.generate_explanation(
-        ["Priority score: 50"],
-        ["Safe deterministic explanation"],
-    )
-
-    assert explanation == ["Safe deterministic explanation"]
-    assert metadata.status == "INVALID_OUTPUT"
-    assert metadata.validation_status == "FAILED"
-
-
-def test_incomplete_case_edge_case(monkeypatch):
-    monkeypatch.setattr(
-        llm_service,
-        "_invoke_gemini",
-        lambda facts: LLMExplanation(
-            summary="The recommendation uses incomplete evidence.",
-            reasons=["Some required information is missing."],
-            confidence_note="No missing information was inferred.",
-        ),
-    )
-
-    explanation, metadata = llm_service.generate_explanation(
-        ["Selected route: INCOMPLETE", "Attendance rate: None"],
-        ["Deterministic incomplete-case explanation"],
-    )
-
-    assert metadata.llm_used is True
-    assert "incomplete" in explanation[0].lower()
-</file>
-
-<file path="evidence/phase-2.3/README.md">
-# Phase 2.3 — Controlled LLM Explanation
-
-## 1. Overview
-
-Phase 2.3 adds an optional Gemini-powered explanation capability to the
-existing deterministic student-support workflow.
-
-The LLM explains an already-computed recommendation. It does not make
-prioritization or routing decisions.
-
-## 2. Decision authority and boundaries
-
-- The five existing deterministic agents continue to evaluate the case.
-- The deterministic decision agent remains the sole decision authority.
-- Conditional routing selects the route before the Explanation Node runs.
-- Gemini generates a concise explanation from supplied workflow facts.
-- Gemini cannot set or change scores, priorities, routes, or recommendations.
-- The case ID and raw activity indicators are not sent to Gemini.
-- Structured LLM output is validated using a Pydantic schema.
-
-## 3. Conditional route explanation
-
-| Route | Condition / purpose | Recommendation |
-|---|---|---|
-| `LOW_RISK` | No major support concerns identified | `NORMAL_FOLLOWUP` |
-| `HIGH_SUPPORT_NEED` | Significant support concerns identified | `PRIORITY_OUTREACH` |
-| `INCOMPLETE` | Essential information is missing | `REQUEST_MORE_INFO` |
-| `CONFLICTING` | Evidence requires human review | `TUTOR_REVIEW` |
-| `TUTOR_REVIEW` | Tutor or coordinator review is required | `TUTOR_REVIEW` |
-
-All selected routes proceed through the shared Explanation Node and then
-the Audit Node. The route is selected deterministically before Gemini runs.
-
-## 4. Graph execution sequence
-
-1. Case Intake Agent
-2. Attendance Agent
-3. Engagement Agent
-4. Support Load Agent
-5. Student Support Decision Agent
-6. Selected conditional route
-7. Explanation Node — Gemini with deterministic fallback
-8. Audit Node
-
-## 5. LLM validation and fallback
-
-The Gemini service supports:
-
-- Structured JSON output validation.
-- Configurable provider, model, and timeout.
-- Missing-key and unsupported-provider handling.
-- Timeout, provider-error, and invalid-output fallback.
-- Deterministic explanation when the LLM is disabled or unavailable.
-
-LLM trace metadata records provider, model, status, whether the LLM was
-used, whether fallback was used, validation status, and error category.
-
-## 6. Verification results
-
-### Live Gemini execution
-
-- Provider: Gemini.
-- Model: `gemini-3.5-flash-lite`.
-- Status: `SUCCESS`.
-- Validation: `VALID`.
-- LLM used: `true`.
-- Fallback used: `false`.
-- Deterministic recommendation: `NORMAL_FOLLOWUP`.
-- Priority score: `0`.
-- Route: `LOW_RISK`.
-- Audit record successfully retrieved with Gemini metadata.
-
-### Timeout fallback
-
-A simulated provider timeout was tested through the workflow.
-
-- Status: `TIMEOUT`.
-- LLM used: `false`.
-- Fallback used: `true`.
-- Deterministic recommendation remained unchanged.
-- Audit record contained timeout and fallback metadata.
-- Graph completed through the Audit Node.
-
-### Automated validation
-
-- Backend test suite: **53 passed**.
-- Frontend ESLint: passed.
-- TypeScript compilation: passed.
-- Vite production build: passed.
-- `git diff --check`: passed at the final evidence check.
-
-## 7. Evidence inventory
-
-The following six screenshots are included:
-
-- `01-phase-2.3.png`
-- `02-phase-2.3.png`
-- `03-phase-2.3.png`
-- `04-phase-2.3.png`
-- `05-phase-2.3.png`
-- `06-phase-2.3.png`
-
-### Normal-path execution — LOW_RISK
-
-- `01-phase-2.3.png` — Normal follow-up recommendation, priority score 0.
-- `02-phase-2.3.png` — Eight-step LangGraph execution trace with `LOW_RISK`.
-- `03-phase-2.3.png` — Gemini success and audit record.
-
-### Conditional / alternate-path execution — HIGH_SUPPORT_NEED
-
-- `04-phase-2.3.png` — Priority outreach recommendation, priority score 100.
-- `05-phase-2.3.png` — Eight-step LangGraph execution trace with
-  `HIGH_SUPPORT_NEED`.
-- `06-phase-2.3.png` — Gemini success and audit record.
-
-The latest project snapshot is:
-
-- `repomix-output.xml`
-
-## 8. Security and limitations
-
-- `.env` contains local credentials and must remain untracked.
-- `.env.example` contains placeholders only.
-- API keys must not be committed or included in evidence snapshots.
-- Automated tests do not require a live Gemini API call.
-- The audit store is currently in-memory and is not durable across
-  backend process restarts.
-- The LLM is optional; deterministic explanations remain available
-  when it is disabled or unavailable.
-
-## 9. Submission checklist
-
-- [ ] Attach a screenshot showing normal-path execution.
-- [ ] Attach a screenshot showing conditional/alternate-path execution.
-- [ ] Include the route table or the short route explanation above.
-- [ ] Include the latest `repomix-output.xml`.
-</file>
-
-<file path=".env.example">
-LLM_ENABLED=false
-LLM_PROVIDER=gemini
-LLM_MODEL=gemini-3.5-flash-lite
-LLM_TIMEOUT=30
-GEMINI_API_KEY=your-gemini-api-key-here
-</file>
-
 <file path="backend/app/agents/__init__.py">
 
 </file>
@@ -1218,6 +793,32 @@ def evaluate_support_load(validated_case: ValidatedCase) -> AgentOutput:
 
 <file path="backend/tests/__init__.py">
 
+</file>
+
+<file path="backend/tests/conftest.py">
+"""Prevent real Gemini requests during general workflow tests."""
+
+import pytest
+
+from backend.app.graphs import student_support_graph as graph_module
+from backend.app.models.schemas import LLMTraceMetadata
+
+
+@pytest.fixture(autouse=True)
+def mock_llm_for_workflow_tests(monkeypatch):
+    def deterministic_fallback(facts, fallback_explanation):
+        return fallback_explanation, LLMTraceMetadata(
+            llm_used=False,
+            status="TEST_FALLBACK",
+            fallback_used=True,
+            validation_status="NOT_RUN",
+        )
+
+    monkeypatch.setattr(
+        graph_module,
+        "generate_explanation",
+        deterministic_fallback,
+    )
 </file>
 
 <file path="backend/tests/test_attendance_agent.py">
@@ -2686,6 +2287,145 @@ The following nine screenshots were captured on 11 November 2026:
 - Workflow state, execution trace, explanation, and audit integration verified.
 </file>
 
+<file path="evidence/phase-2.3/README.md">
+# Phase 2.3 — Controlled LLM Explanation
+
+## 1. Overview
+
+Phase 2.3 adds an optional Gemini-powered explanation capability to the
+existing deterministic student-support workflow.
+
+The LLM explains an already-computed recommendation. It does not make
+prioritization or routing decisions.
+
+## 2. Decision authority and boundaries
+
+- The five existing deterministic agents continue to evaluate the case.
+- The deterministic decision agent remains the sole decision authority.
+- Conditional routing selects the route before the Explanation Node runs.
+- Gemini generates a concise explanation from supplied workflow facts.
+- Gemini cannot set or change scores, priorities, routes, or recommendations.
+- The case ID and raw activity indicators are not sent to Gemini.
+- Structured LLM output is validated using a Pydantic schema.
+
+## 3. Conditional route explanation
+
+| Route | Condition / purpose | Recommendation |
+|---|---|---|
+| `LOW_RISK` | No major support concerns identified | `NORMAL_FOLLOWUP` |
+| `HIGH_SUPPORT_NEED` | Significant support concerns identified | `PRIORITY_OUTREACH` |
+| `INCOMPLETE` | Essential information is missing | `REQUEST_MORE_INFO` |
+| `CONFLICTING` | Evidence requires human review | `TUTOR_REVIEW` |
+| `TUTOR_REVIEW` | Tutor or coordinator review is required | `TUTOR_REVIEW` |
+
+All selected routes proceed through the shared Explanation Node and then
+the Audit Node. The route is selected deterministically before Gemini runs.
+
+## 4. Graph execution sequence
+
+1. Case Intake Agent
+2. Attendance Agent
+3. Engagement Agent
+4. Support Load Agent
+5. Student Support Decision Agent
+6. Selected conditional route
+7. Explanation Node — Gemini with deterministic fallback
+8. Audit Node
+
+## 5. LLM validation and fallback
+
+The Gemini service supports:
+
+- Structured JSON output validation.
+- Configurable provider, model, and timeout.
+- Missing-key and unsupported-provider handling.
+- Timeout, provider-error, and invalid-output fallback.
+- Deterministic explanation when the LLM is disabled or unavailable.
+
+LLM trace metadata records provider, model, status, whether the LLM was
+used, whether fallback was used, validation status, and error category.
+
+## 6. Verification results
+
+### Live Gemini execution
+
+- Provider: Gemini.
+- Model: `gemini-3.5-flash-lite`.
+- Status: `SUCCESS`.
+- Validation: `VALID`.
+- LLM used: `true`.
+- Fallback used: `false`.
+- Deterministic recommendation: `NORMAL_FOLLOWUP`.
+- Priority score: `0`.
+- Route: `LOW_RISK`.
+- Audit record successfully retrieved with Gemini metadata.
+
+### Timeout fallback
+
+A simulated provider timeout was tested through the workflow.
+
+- Status: `TIMEOUT`.
+- LLM used: `false`.
+- Fallback used: `true`.
+- Deterministic recommendation remained unchanged.
+- Audit record contained timeout and fallback metadata.
+- Graph completed through the Audit Node.
+
+### Automated validation
+
+- Backend test suite: **53 passed**.
+- Frontend ESLint: passed.
+- TypeScript compilation: passed.
+- Vite production build: passed.
+- `git diff --check`: passed at the final evidence check.
+
+## 7. Evidence inventory
+
+The following six screenshots are included:
+
+- `01-phase-2.3.png`
+- `02-phase-2.3.png`
+- `03-phase-2.3.png`
+- `04-phase-2.3.png`
+- `05-phase-2.3.png`
+- `06-phase-2.3.png`
+
+### Normal-path execution — LOW_RISK
+
+- `01-phase-2.3.png` — Normal follow-up recommendation, priority score 0.
+- `02-phase-2.3.png` — Eight-step LangGraph execution trace with `LOW_RISK`.
+- `03-phase-2.3.png` — Gemini success and audit record.
+
+### Conditional / alternate-path execution — HIGH_SUPPORT_NEED
+
+- `04-phase-2.3.png` — Priority outreach recommendation, priority score 100.
+- `05-phase-2.3.png` — Eight-step LangGraph execution trace with
+  `HIGH_SUPPORT_NEED`.
+- `06-phase-2.3.png` — Gemini success and audit record.
+
+The latest project snapshot is:
+
+- `repomix-output.xml`
+
+## 8. Security and limitations
+
+- `.env` contains local credentials and must remain untracked.
+- `.env.example` contains placeholders only.
+- API keys must not be committed or included in evidence snapshots.
+- Automated tests do not require a live Gemini API call.
+- The audit store is currently in-memory and is not durable across
+  backend process restarts.
+- The LLM is optional; deterministic explanations remain available
+  when it is disabled or unavailable.
+
+## 9. Submission checklist
+
+- [ ] Attach a screenshot showing normal-path execution.
+- [ ] Attach a screenshot showing conditional/alternate-path execution.
+- [ ] Include the route table or the short route explanation above.
+- [ ] Include the latest `repomix-output.xml`.
+</file>
+
 <file path="frontend/nginx/default.conf.template">
 server {
     listen 80;
@@ -3026,6 +2766,14 @@ export default defineConfig({
 })
 </file>
 
+<file path=".env.example">
+LLM_ENABLED=false
+LLM_PROVIDER=gemini
+LLM_MODEL=gemini-3.5-flash-lite
+LLM_TIMEOUT=30
+GEMINI_API_KEY=your-gemini-api-key-here
+</file>
+
 <file path=".gitignore">
 .venv/
 __pycache__/
@@ -3087,6 +2835,425 @@ services:
       retries: 5
       start_period: 5s
     restart: unless-stopped
+</file>
+
+<file path="backend/app/services/llm_service.py">
+"""Controlled Gemini explanation service with deterministic fallback."""
+
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from pydantic import ValidationError
+
+from backend.app.models.schemas import (
+    LLMExplanation,
+    LLMTraceMetadata,
+)
+
+load_dotenv(dotenv_path=Path.cwd() / ".env")
+
+
+def _invoke_gemini(facts: list[str]) -> LLMExplanation:
+    """Generate a structured explanation using only supplied facts."""
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("MISSING_API_KEY")
+
+    model = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
+    timeout = int(os.getenv("LLM_TIMEOUT", "12"))
+
+    client = genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(timeout=timeout * 1000),
+    )
+
+    prompt = f"""
+You are an explanation assistant for a student support workflow.
+
+Your ONLY task is to explain an existing deterministic recommendation.
+
+Rules:
+- Use only the supplied facts.
+- Do not change scores, priority, decisions, or recommendations.
+- Do not invent evidence or student information.
+- Do not make a new support decision.
+- Keep the explanation concise and factual.
+
+Supplied facts:
+{facts}
+"""
+
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=LLMExplanation,
+        ),
+    )
+
+    if not response.text:
+        raise ValueError("Empty model response")
+
+    return LLMExplanation.model_validate_json(response.text)
+
+
+def generate_explanation(
+    facts: list[str],
+    fallback_explanation: list[str],
+) -> tuple[list[str], LLMTraceMetadata]:
+    """Use Gemini when available; otherwise preserve deterministic output."""
+
+    provider = os.getenv("LLM_PROVIDER", "gemini")
+    model = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
+    enabled = os.getenv("LLM_ENABLED", "false").lower() in {
+        "true",
+        "1",
+        "yes",
+    }
+
+    def fallback(status: str, error: str | None = None):
+        return fallback_explanation, LLMTraceMetadata(
+            llm_used=False,
+            provider=provider,
+            model=model,
+            status=status,
+            fallback_used=True,
+            validation_status="FAILED" if error else "NOT_RUN",
+            error_category=error,
+        )
+
+    if not enabled:
+        return fallback("DISABLED")
+
+    if provider != "gemini":
+        return fallback("UNSUPPORTED_PROVIDER", "ConfigurationError")
+
+    if not os.getenv("GEMINI_API_KEY"):
+        return fallback("MISSING_API_KEY", "ConfigurationError")
+
+    try:
+        result = _invoke_gemini(facts)
+
+        return (
+            [
+                result.summary,
+                *result.reasons,
+                result.confidence_note,
+            ],
+            LLMTraceMetadata(
+                llm_used=True,
+                provider=provider,
+                model=model,
+                status="SUCCESS",
+                fallback_used=False,
+                validation_status="VALID",
+            ),
+        )
+
+    except ValidationError:
+        return fallback("INVALID_OUTPUT", "ValidationError")
+
+    except Exception as exc:
+        error_name = type(exc).__name__
+        error_message = str(exc).upper()
+
+        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
+            return fallback("QUOTA_EXCEEDED", "QuotaExceeded")
+
+        if "TIMEOUT" in error_name.upper():
+            return fallback("TIMEOUT", "TimeoutError")
+
+        return fallback("ERROR", error_name)
+</file>
+
+<file path="backend/tests/test_llm_service.py">
+"""Evaluation tests for the controlled Gemini explanation service."""
+
+from pydantic import ValidationError
+
+from backend.app.models.schemas import LLMExplanation
+from backend.app.services import llm_service
+
+
+def setup_function():
+    import os
+    os.environ["LLM_ENABLED"] = "true"
+    os.environ["LLM_PROVIDER"] = "gemini"
+    os.environ["LLM_MODEL"] = "gemini-3.5-flash-lite"
+    os.environ["GEMINI_API_KEY"] = "test-key"
+
+
+def test_valid_gemini_response(monkeypatch):
+    monkeypatch.setattr(
+        llm_service,
+        "_invoke_gemini",
+        lambda facts: LLMExplanation(
+            summary="The existing recommendation is supported.",
+            reasons=["Attendance evidence supports the decision."],
+            confidence_note="Based only on supplied evidence.",
+        ),
+    )
+
+    explanation, metadata = llm_service.generate_explanation(
+        ["Priority score: 80"],
+        ["Deterministic fallback"],
+    )
+
+    assert explanation[0] == "The existing recommendation is supported."
+    assert metadata.llm_used is True
+    assert metadata.fallback_used is False
+    assert metadata.validation_status == "VALID"
+
+
+def test_ambiguous_input_is_passed_as_facts(monkeypatch):
+    received = []
+
+    def fake_invoke(facts):
+        received.extend(facts)
+        return LLMExplanation(
+            summary="The available evidence is limited.",
+            reasons=["Some information is unclear."],
+            confidence_note="No additional facts were assumed.",
+        )
+
+    monkeypatch.setattr(llm_service, "_invoke_gemini", fake_invoke)
+
+    explanation, metadata = llm_service.generate_explanation(
+        ["Attendance evidence is incomplete"],
+        ["Deterministic fallback"],
+    )
+
+    assert received == ["Attendance evidence is incomplete"]
+    assert metadata.llm_used is True
+    assert "limited" in explanation[0]
+
+
+def test_timeout_uses_deterministic_fallback(monkeypatch):
+    def timeout(_facts):
+        raise TimeoutError("Simulated timeout")
+
+    monkeypatch.setattr(llm_service, "_invoke_gemini", timeout)
+
+    explanation, metadata = llm_service.generate_explanation(
+        ["Priority score: 90"],
+        ["Original deterministic explanation"],
+    )
+
+    assert explanation == ["Original deterministic explanation"]
+    assert metadata.status == "TIMEOUT"
+    assert metadata.fallback_used is True
+
+
+def test_invalid_output_uses_deterministic_fallback(monkeypatch):
+    def invalid(_facts):
+        return LLMExplanation.model_validate({
+            "summary": "",
+            "reasons": [],
+            "confidence_note": "Invalid summary",
+        })
+
+    monkeypatch.setattr(llm_service, "_invoke_gemini", invalid)
+
+    explanation, metadata = llm_service.generate_explanation(
+        ["Priority score: 50"],
+        ["Safe deterministic explanation"],
+    )
+
+    assert explanation == ["Safe deterministic explanation"]
+    assert metadata.status == "INVALID_OUTPUT"
+    assert metadata.validation_status == "FAILED"
+
+
+def test_incomplete_case_edge_case(monkeypatch):
+    monkeypatch.setattr(
+        llm_service,
+        "_invoke_gemini",
+        lambda facts: LLMExplanation(
+            summary="The recommendation uses incomplete evidence.",
+            reasons=["Some required information is missing."],
+            confidence_note="No missing information was inferred.",
+        ),
+    )
+
+    explanation, metadata = llm_service.generate_explanation(
+        ["Selected route: INCOMPLETE", "Attendance rate: None"],
+        ["Deterministic incomplete-case explanation"],
+    )
+
+    assert metadata.llm_used is True
+    assert "incomplete" in explanation[0].lower()
+</file>
+
+<file path="docs/04_Workflow_Shared_Context_Explainability_Guide.md">
+# RealRails Batch 2 — Workflow, Shared Context & Explainability Guide
+## Purpose
+
+Use this guide in Phase 1.4 to make the working application explain its own Agentic AI flow.
+
+---
+
+## What the Reviewer Must Understand
+
+The application should make it possible to answer:
+
+1. What business input started the workflow?
+2. Which agents executed?
+3. What does each agent do?
+4. What did each agent read?
+5. What did each agent produce?
+6. How did the shared context change?
+7. Which deterministic rules influenced the result?
+8. Where was the final recommendation made?
+9. Why was that recommendation produced?
+10. Where is the audit evidence?
+
+---
+
+## Required Concept
+
+Use the term:
+
+> **Run-scoped shared workflow context**
+
+It is the structured state used during one workflow execution.
+
+It is not automatically:
+
+- long-term memory
+- semantic memory
+- persistent agent memory
+- an AI brain
+
+---
+
+## Recommended Context View
+
+A case may expose:
+
+```text
+workflow_id
+business_input
+validated_input
+
+shared_context
+  ├─ reference/domain data
+  ├─ calculated fields
+  └─ current workflow status
+
+agent_outputs
+  ├─ agent_a
+  ├─ agent_b
+  ├─ agent_c
+  └─ ...
+
+final_recommendation
+explanation
+audit_reference
+errors
+```
+
+Only show fields that actually exist.
+
+---
+
+## Recommended UI Patterns
+
+Use one simple pattern or combination:
+
+- agent execution timeline
+- workflow console
+- expandable agent cards
+- shared-context panel
+- decision-evidence panel
+- audit panel
+
+The UI should be functional, not theatrical.
+
+Avoid creating a separate animated HTML learning assignment.
+
+---
+
+## Agent Card Minimum
+
+A reviewer should be able to see:
+
+```text
+Agent Name
+Responsibility
+Input Used
+Output Produced
+Status
+Evidence / Rule Result
+```
+
+Do not pretend agents are natural-language chat participants unless that is actually implemented.
+
+---
+
+## Explanation Rules
+
+Explanation should be derived from:
+
+- agent outputs
+- triggered rules
+- scores
+- matched evidence
+- missing-data flags
+- decision result
+
+In Phase 1, deterministic explanation templates are sufficient.
+
+Do not invent evidence.
+
+---
+
+## Audit Rules
+
+Audit should allow a reviewer to trace:
+
+```text
+Input
+→ Execution
+→ Agent Outputs
+→ Rule Triggers
+→ Final Recommendation
+```
+
+An in-memory audit is acceptable for the MVP if clearly stated.
+
+---
+
+## Product Bible Alignment
+
+The Product Bible controls:
+
+- agent names/responsibilities
+- domain fields
+- rule meaning
+- decision output
+- evidence requirements
+
+The generic workflow view must adapt to the selected case.
+
+Do not force every project to display identical domain content.
+
+---
+
+## Completion Check
+
+- [ ] actual agents are visible
+- [ ] execution order is accurate
+- [ ] shared context is visible or inspectable
+- [ ] rule/evidence is visible
+- [ ] final recommendation is visible
+- [ ] explanation is evidence-based
+- [ ] audit reference exists
+- [ ] UI does not claim nonexistent functionality
 </file>
 
 <file path="backend/app/graphs/student_support_graph.py">
@@ -3478,130 +3645,6 @@ def build_student_support_graph():
 student_support_graph = build_student_support_graph()
 </file>
 
-<file path="backend/app/models/schemas.py">
-"""Pydantic schemas for the AA004 Student Support Prioritization MVP."""
-
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any
-
-from pydantic import BaseModel, Field
-
-
-class EngagementStatus(str, Enum):
-    ACTIVE = "active"
-    LOW = "low"
-    INACTIVE = "inactive"
-    UNKNOWN = "unknown"
-
-
-class RecommendationAction(str, Enum):
-    NORMAL_FOLLOWUP = "NORMAL_FOLLOWUP"
-    PRIORITY_OUTREACH = "PRIORITY_OUTREACH"
-    TUTOR_REVIEW = "TUTOR_REVIEW"
-    REQUEST_MORE_INFO = "REQUEST_MORE_INFO"
-
-
-class StudentCaseInput(BaseModel):
-    """Business input. Optional evidence allows incomplete cases to be identified."""
-
-    case_id: str = Field(min_length=1, description="Non-identifying support case reference")
-    attendance_rate: float | None = Field(default=None, ge=0, le=100)
-    missed_submissions: int | None = Field(default=None, ge=0)
-    engagement_status: EngagementStatus | None = None
-    days_since_last_activity: int | None = Field(default=None, ge=0)
-    unresolved_support_tickets: int | None = Field(default=None, ge=0)
-    recent_activity_indicators: list[str] = Field(default_factory=list)
-
-
-class ValidatedCase(BaseModel):
-    """Normalized case data produced by the Case Intake Agent."""
-
-    case_id: str
-    attendance_rate: float | None = None
-    missed_submissions: int | None = None
-    engagement_status: EngagementStatus | None = None
-    days_since_last_activity: int | None = None
-    unresolved_support_tickets: int | None = None
-    recent_activity_indicators: list[str] = Field(default_factory=list)
-    missing_fields: list[str] = Field(default_factory=list)
-
-
-class EvidenceItem(BaseModel):
-    """A traceable fact used by an agent or decision rule."""
-
-    source: str
-    detail: str
-    value: str | int | float | bool | None = None
-
-
-class AgentOutput(BaseModel):
-    """Common structured output contract for each specialized agent."""
-
-    agent_name: str
-    status: str
-    summary: str
-    score: int = Field(default=0, ge=0, le=100)
-    flag: str | None = None
-    evidence: list[EvidenceItem] = Field(default_factory=list)
-    output_data: dict[str, Any] = Field(default_factory=dict)
-
-
-class FinalRecommendation(BaseModel):
-    action: RecommendationAction
-    priority_score: int = Field(ge=0, le=100)
-    priority_band: str
-    reasons: list[str] = Field(default_factory=list)
-    triggered_rules: list[str] = Field(default_factory=list)
-    evidence: list[EvidenceItem] = Field(default_factory=list)
-    agent_output_refs: list[str] = Field(default_factory=list)
-
-
-class LLMExplanation(BaseModel):
-    """Validated, non-authoritative AI explanation."""
-
-    summary: str = Field(min_length=1, max_length=500)
-    reasons: list[str] = Field(default_factory=list, max_length=5)
-    confidence_note: str = Field(min_length=1, max_length=300)
-
-
-class LLMTraceMetadata(BaseModel):
-    """Safe metadata describing the optional LLM invocation."""
-
-    llm_used: bool = False
-    provider: str = "gemini"
-    model: str = "gemini-3.8-flash"
-    status: str = "NOT_CONFIGURED"
-    fallback_used: bool = True
-    validation_status: str = "NOT_RUN"
-    error_category: str | None = None
-
-
-class WorkflowContext(BaseModel):
-    """Shared context scoped to one workflow execution; not long-term memory."""
-
-    workflow_id: str
-    student_case: StudentCaseInput
-    validated_case: ValidatedCase | None = None
-    attendance_flag: str | None = None
-    engagement_flag: str | None = None
-    support_load_flag: str | None = None
-    scores: dict[str, int] = Field(default_factory=dict)
-    agent_outputs: list[AgentOutput] = Field(default_factory=list)
-    final_recommendation: FinalRecommendation | None = None
-    explanation: list[str] = Field(default_factory=list)
-    llm_metadata: LLMTraceMetadata = Field(
-        default_factory=LLMTraceMetadata
-    )
-
-    audit_reference: str | None = None
-    node_trace: list[str] = Field(default_factory=list)
-    errors: list[str] = Field(default_factory=list)
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-</file>
-
 <file path="backend/app/services/audit_service.py">
 """In-memory audit storage for AA004 workflow executions."""
 
@@ -3656,206 +3699,6 @@ def clear_audit_records() -> None:
     """Clear in-memory audit records, primarily for isolated tests."""
 
     _AUDIT_RECORDS.clear()
-</file>
-
-<file path="backend/requirements.txt">
-annotated-doc==0.0.5
-annotated-types==0.8.0
-anyio==4.16.0
-certifi==2026.10.23
-click==8.5.1
-fastapi==0.162.1
-h11==0.16.0
-httpcore==1.0.9
-httptools==0.9.0
-httpx==0.28.1
-idna==3.20
-iniconfig==2.3.1
-opentelemetry-api==1.45.2
-packaging==26.3
-pluggy==1.7.0
-pydantic==2.14.3
-pydantic_core==2.50.4
-Pygments==2.21.0
-pytest==9.2.0
-python-dotenv==1.2.4
-PyYAML==6.0.3
-starlette==1.10.0
-typing-inspection==0.4.5
-typing_extensions==4.16.0
-uvicorn==0.54.0
-uvloop==0.23.0
-watchfiles==1.3.0
-websockets==17.4
-langgraph==1.2.20
-google-genai==3.1.0
-</file>
-
-<file path="docs/04_Workflow_Shared_Context_Explainability_Guide.md">
-# RealRails Batch 2 — Workflow, Shared Context & Explainability Guide
-## Purpose
-
-Use this guide in Phase 1.4 to make the working application explain its own Agentic AI flow.
-
----
-
-## What the Reviewer Must Understand
-
-The application should make it possible to answer:
-
-1. What business input started the workflow?
-2. Which agents executed?
-3. What does each agent do?
-4. What did each agent read?
-5. What did each agent produce?
-6. How did the shared context change?
-7. Which deterministic rules influenced the result?
-8. Where was the final recommendation made?
-9. Why was that recommendation produced?
-10. Where is the audit evidence?
-
----
-
-## Required Concept
-
-Use the term:
-
-> **Run-scoped shared workflow context**
-
-It is the structured state used during one workflow execution.
-
-It is not automatically:
-
-- long-term memory
-- semantic memory
-- persistent agent memory
-- an AI brain
-
----
-
-## Recommended Context View
-
-A case may expose:
-
-```text
-workflow_id
-business_input
-validated_input
-
-shared_context
-  ├─ reference/domain data
-  ├─ calculated fields
-  └─ current workflow status
-
-agent_outputs
-  ├─ agent_a
-  ├─ agent_b
-  ├─ agent_c
-  └─ ...
-
-final_recommendation
-explanation
-audit_reference
-errors
-```
-
-Only show fields that actually exist.
-
----
-
-## Recommended UI Patterns
-
-Use one simple pattern or combination:
-
-- agent execution timeline
-- workflow console
-- expandable agent cards
-- shared-context panel
-- decision-evidence panel
-- audit panel
-
-The UI should be functional, not theatrical.
-
-Avoid creating a separate animated HTML learning assignment.
-
----
-
-## Agent Card Minimum
-
-A reviewer should be able to see:
-
-```text
-Agent Name
-Responsibility
-Input Used
-Output Produced
-Status
-Evidence / Rule Result
-```
-
-Do not pretend agents are natural-language chat participants unless that is actually implemented.
-
----
-
-## Explanation Rules
-
-Explanation should be derived from:
-
-- agent outputs
-- triggered rules
-- scores
-- matched evidence
-- missing-data flags
-- decision result
-
-In Phase 1, deterministic explanation templates are sufficient.
-
-Do not invent evidence.
-
----
-
-## Audit Rules
-
-Audit should allow a reviewer to trace:
-
-```text
-Input
-→ Execution
-→ Agent Outputs
-→ Rule Triggers
-→ Final Recommendation
-```
-
-An in-memory audit is acceptable for the MVP if clearly stated.
-
----
-
-## Product Bible Alignment
-
-The Product Bible controls:
-
-- agent names/responsibilities
-- domain fields
-- rule meaning
-- decision output
-- evidence requirements
-
-The generic workflow view must adapt to the selected case.
-
-Do not force every project to display identical domain content.
-
----
-
-## Completion Check
-
-- [ ] actual agents are visible
-- [ ] execution order is accurate
-- [ ] shared context is visible or inspectable
-- [ ] rule/evidence is visible
-- [ ] final recommendation is visible
-- [ ] explanation is evidence-based
-- [ ] audit reference exists
-- [ ] UI does not claim nonexistent functionality
 </file>
 
 <file path="backend/app/services/workflow_service.py">
@@ -4205,6 +4048,39 @@ def test_all_five_routes_reach_explanation_and_audit():
         assert len(context.agent_outputs) == 5
 </file>
 
+<file path="backend/requirements.txt">
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.16.0
+certifi==2026.10.23
+click==8.5.1
+fastapi==0.162.1
+h11==0.16.0
+httpcore==1.0.9
+httptools==0.9.0
+httpx==0.28.1
+idna==3.20
+iniconfig==2.3.1
+opentelemetry-api==1.45.2
+packaging==26.3
+pluggy==1.7.0
+pydantic==2.14.3
+pydantic_core==2.50.4
+Pygments==2.21.0
+pytest==9.2.0
+python-dotenv==1.2.4
+PyYAML==6.0.3
+starlette==1.10.0
+typing-inspection==0.4.5
+typing_extensions==4.16.0
+uvicorn==0.54.0
+uvloop==0.23.0
+watchfiles==1.3.0
+websockets==17.4
+langgraph==1.2.20
+google-genai==3.1.0
+</file>
+
 <file path="docs/AA004_Implementation_Plan.md">
 # AA004 — Implementation Plan
 ## Student Support Case Prioritization
@@ -4430,6 +4306,130 @@ These are outside the current Phase 1.4 scope.
 - [ ] Backend tests pass.
 - [ ] Frontend build and lint pass.
 - [ ] Latest Repomix and Phase 1.4 screenshots are captured.
+</file>
+
+<file path="backend/app/models/schemas.py">
+"""Pydantic schemas for the AA004 Student Support Prioritization MVP."""
+
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, Field
+
+
+class EngagementStatus(str, Enum):
+    ACTIVE = "active"
+    LOW = "low"
+    INACTIVE = "inactive"
+    UNKNOWN = "unknown"
+
+
+class RecommendationAction(str, Enum):
+    NORMAL_FOLLOWUP = "NORMAL_FOLLOWUP"
+    PRIORITY_OUTREACH = "PRIORITY_OUTREACH"
+    TUTOR_REVIEW = "TUTOR_REVIEW"
+    REQUEST_MORE_INFO = "REQUEST_MORE_INFO"
+
+
+class StudentCaseInput(BaseModel):
+    """Business input. Optional evidence allows incomplete cases to be identified."""
+
+    case_id: str = Field(min_length=1, description="Non-identifying support case reference")
+    attendance_rate: float | None = Field(default=None, ge=0, le=100)
+    missed_submissions: int | None = Field(default=None, ge=0)
+    engagement_status: EngagementStatus | None = None
+    days_since_last_activity: int | None = Field(default=None, ge=0)
+    unresolved_support_tickets: int | None = Field(default=None, ge=0)
+    recent_activity_indicators: list[str] = Field(default_factory=list)
+
+
+class ValidatedCase(BaseModel):
+    """Normalized case data produced by the Case Intake Agent."""
+
+    case_id: str
+    attendance_rate: float | None = None
+    missed_submissions: int | None = None
+    engagement_status: EngagementStatus | None = None
+    days_since_last_activity: int | None = None
+    unresolved_support_tickets: int | None = None
+    recent_activity_indicators: list[str] = Field(default_factory=list)
+    missing_fields: list[str] = Field(default_factory=list)
+
+
+class EvidenceItem(BaseModel):
+    """A traceable fact used by an agent or decision rule."""
+
+    source: str
+    detail: str
+    value: str | int | float | bool | None = None
+
+
+class AgentOutput(BaseModel):
+    """Common structured output contract for each specialized agent."""
+
+    agent_name: str
+    status: str
+    summary: str
+    score: int = Field(default=0, ge=0, le=100)
+    flag: str | None = None
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+    output_data: dict[str, Any] = Field(default_factory=dict)
+
+
+class FinalRecommendation(BaseModel):
+    action: RecommendationAction
+    priority_score: int = Field(ge=0, le=100)
+    priority_band: str
+    reasons: list[str] = Field(default_factory=list)
+    triggered_rules: list[str] = Field(default_factory=list)
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+    agent_output_refs: list[str] = Field(default_factory=list)
+
+
+class LLMExplanation(BaseModel):
+    """Validated, non-authoritative AI explanation."""
+
+    summary: str = Field(min_length=1, max_length=500)
+    reasons: list[str] = Field(default_factory=list, max_length=5)
+    confidence_note: str = Field(min_length=1, max_length=300)
+
+
+class LLMTraceMetadata(BaseModel):
+    """Safe metadata describing the optional LLM invocation."""
+
+    llm_used: bool = False
+    provider: str = "gemini"
+    model: str = "gemini-3.5-flash-lite"
+    status: str = "NOT_CONFIGURED"
+    fallback_used: bool = True
+    validation_status: str = "NOT_RUN"
+    error_category: str | None = None
+
+
+class WorkflowContext(BaseModel):
+    """Shared context scoped to one workflow execution; not long-term memory."""
+
+    workflow_id: str
+    student_case: StudentCaseInput
+    validated_case: ValidatedCase | None = None
+    attendance_flag: str | None = None
+    engagement_flag: str | None = None
+    support_load_flag: str | None = None
+    scores: dict[str, int] = Field(default_factory=dict)
+    agent_outputs: list[AgentOutput] = Field(default_factory=list)
+    final_recommendation: FinalRecommendation | None = None
+    explanation: list[str] = Field(default_factory=list)
+    llm_metadata: LLMTraceMetadata = Field(
+        default_factory=LLMTraceMetadata
+    )
+
+    audit_reference: str | None = None
+    node_trace: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 </file>
 
 <file path="frontend/src/App.css">
@@ -6016,18 +6016,20 @@ Potential future enhancements include:
 **Domain:** Education Operations
 **Current implementation:** Phase 2.3 — Controlled LLM Explanation
 
-### Existing Phase 1.4 Deployment
+### Phase 2.3 Production Deployment
 
-The following deployment remains the Phase 1.4 cloud version. Phase 2.2 has been committed and pushed to GitHub but has not been deployed.
+The current cloud deployment runs the accepted Phase 2.3 — Controlled LLM Explanation implementation.
 
-- Frontend: https://aa-004-student-support-prioritizati.vercel.app/
-- Backend health: https://aa004-student-support-prioritization.onrender.com/health
+- Frontend — Vercel: https://aa-004-student-support-prioritization-1zcj9gqb0-diyamol123.vercel.app/
+- Backend health — Render: https://aa004-student-support-prioritization.onrender.com/health
+
+The production deployment was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
 
 The Render free instance may take time to wake after inactivity.
 
 ---
 
-**Current Status:** Phase 2.2 implementation and local validation completed. Reviewer accepted. Phase 2.3 — Controlled LLM Explanation implementation and local evidence preparation completed. Reviewer approval pending.
+**Current Status:** Phase 2.3 — Controlled LLM Explanation implemented, deployed, tested, and accepted by the reviewer. The core RealRails Agentic AI Batch 2 journey is complete. Optional Phase 3 — Productization is available as the next stage.
 </file>
 
 </files>
