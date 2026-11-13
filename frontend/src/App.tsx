@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import './App.css'
 
 type CaseInput = {
@@ -135,6 +135,51 @@ const agentDescriptions: Record<string, string> = {
   'Student Support Decision Agent': 'Combines evidence into a support recommendation.',
 }
 
+const evidenceSourceLabels: Record<string, string> = {
+  'student_case.attendance_rate': 'Attendance indicator',
+  'student_case.days_since_last_activity': 'Recent activity',
+  'student_case.engagement_status': 'Engagement indicator',
+  'student_case.missed_submissions': 'Missed submissions',
+  'student_case.unresolved_support_tickets': 'Open support requests',
+  attendance_demo_thresholds: 'Attendance guidance',
+  engagement_demo_thresholds: 'Activity guidance',
+  support_load_demo_thresholds: 'Support-load guidance',
+  decision_agent: 'Decision evidence',
+}
+
+const intakeEvidenceLabels: Record<string, string> = {
+  attendance_rate: 'Attendance information',
+  missed_submissions: 'Submission information',
+  engagement_status: 'Engagement information',
+  unresolved_support_tickets: 'Support request information',
+}
+
+function getEvidenceSourceLabel(source: string, detail = ''): string {
+  if (source === 'student_case') {
+    const field = detail.match(/^([a-z_]+) was supplied$/)?.[1]
+    return field ? intakeEvidenceLabels[field] ?? 'Case information' : 'Case information'
+  }
+
+  return evidenceSourceLabels[source] ?? 'Case evidence'
+}
+
+function getEvidenceDisplayDetail(source: string, detail: string): string {
+  if (source === 'decision_agent' && detail.startsWith('Incomplete evidence from:')) {
+    return 'Some essential support information is missing or unavailable.'
+  }
+
+  return detail
+}
+
+function getEvidenceDisplayValue(value: Evidence['value']): string {
+  if (typeof value === 'string' && value.startsWith('EngagementStatus.')) {
+    return value.replace('EngagementStatus.', '').toLowerCase()
+      .replace(/^./, (letter) => letter.toUpperCase())
+  }
+
+  return String(value)
+}
+
 function App() {
   const [caseData, setCaseData] = useState<CaseInput>(initialCase)
   const [result, setResult] = useState<WorkflowResult | null>(null)
@@ -143,6 +188,18 @@ function App() {
   const [auditLoading, setAuditLoading] = useState(false)
   const [error, setError] = useState('')
   const [activeSection, setActiveSection] = useState('case-prioritization')
+  const [showTechnicalReview, setShowTechnicalReview] = useState(false)
+
+  useEffect(() => {
+    const target = showTechnicalReview
+      ? document.getElementById(activeSection)
+        ?? document.getElementById('technical-workspace')
+      : activeSection === 'case-prioritization'
+        ? document.getElementById('case-prioritization')
+        : null
+
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [showTechnicalReview, activeSection])
 
   function updateField<K extends keyof CaseInput>(key: K, value: CaseInput[K]) {
     setCaseData((current) => ({ ...current, [key]: value }))
@@ -212,23 +269,36 @@ function App() {
   }
 
   function navigateTo(sectionId: string) {
-    const target = document.getElementById(sectionId)
-
-    if (!target) {
-      setError('Run a workflow first to view the agent workflow and audit evidence.')
-      document.getElementById('case-prioritization')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
+    if (sectionId === 'agent-workflow' || sectionId === 'audit-evidence') {
+      setActiveSection(sectionId)
+      setShowTechnicalReview(true)
       return
     }
-
+    setShowTechnicalReview(false)
     setActiveSection(sectionId)
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
   }
 
   const recommendation = result?.final_recommendation
   const actionClass = recommendation?.action.toLowerCase().replaceAll('_', '-')
+
+  const suggestedNextStep = (() => {
+    switch (recommendation?.action) {
+      case 'PRIORITY_OUTREACH':
+        return 'A support coordinator should review the evidence and consider timely student outreach.'
+      case 'TUTOR_REVIEW':
+        return 'Refer the case to the appropriate tutor for human review of the available indicators.'
+      case 'REQUEST_MORE_INFO':
+        return 'Confirm the missing case information before deciding on an appropriate support follow-up.'
+      case 'NORMAL_FOLLOWUP':
+        return 'Continue routine monitoring through the usual academic support process.'
+      default:
+        return 'Review the available case evidence before selecting a support follow-up.'
+    }
+  })()
 
   return (
     <div className="app-shell">
@@ -237,7 +307,7 @@ function App() {
           <div className="brand-mark">A</div>
           <div>
             <strong>AA004</strong>
-            <span>Student Support AI</span>
+            <span>Student Support Workspace</span>
           </div>
         </div>
 
@@ -248,7 +318,7 @@ function App() {
           onClick={() => navigateTo('case-prioritization')}
           aria-current={activeSection === 'case-prioritization' ? 'location' : undefined}
         >
-          <span>▦</span> Case prioritization
+          <span>▦</span> Student Support
         </button>
         <button
           className={`nav-item ${activeSection === 'agent-workflow' ? 'active' : ''}`}
@@ -256,7 +326,7 @@ function App() {
           onClick={() => navigateTo('agent-workflow')}
           aria-current={activeSection === 'agent-workflow' ? 'location' : undefined}
         >
-          <span>◎</span> Agent workflow
+          <span>◎</span> Explainability & Audit
         </button>
         <button
           className={`nav-item ${activeSection === 'audit-evidence' ? 'active' : ''}`}
@@ -264,14 +334,14 @@ function App() {
           onClick={() => navigateTo('audit-evidence')}
           aria-current={activeSection === 'audit-evidence' ? 'location' : undefined}
         >
-          <span>◷</span> Audit evidence
+          <span>◷</span> Audit record
         </button>
 
         <div className="sidebar-bottom">
           <div className="status-dot" />
           <div>
-            <strong>LangGraph Conditional Orchestration</strong>
-            <span>Phase 2.3 · Conditional LangGraph workflow</span>
+            <strong>Human-led support review</strong>
+            <span>Evidence-based decision support</span>
           </div>
         </div>
       </aside>
@@ -280,8 +350,8 @@ function App() {
         <header className="topbar">
           <div>
             <div className="eyebrow">EDUCATION OPERATIONS / AA004</div>
-            <h1>Student Support Prioritization</h1>
-            <p>Evidence-led prioritization for timely academic support.</p>
+            <h1>Student Support Workspace</h1>
+            <p>Review student support indicators and coordinate appropriate follow-up.</p>
           </div>
           <div className="top-status">
             <span className="status-dot" /> Live workflow API
@@ -290,19 +360,19 @@ function App() {
 
         <section className="overview-grid">
           <div className="overview-card">
-            <span className="metric-label">WORKFLOW</span>
-            <strong>8 execution steps</strong>
-            <small>5 agents · 1 selected route · explanation + audit</small>
+            <span className="metric-label">SUPPORT PROCESS</span>
+            <strong>Evidence-led review</strong>
+            <small>Review case indicators before choosing a follow-up</small>
           </div>
           <div className="overview-card">
-            <span className="metric-label">DECISION MODEL</span>
-            <strong>Rule-based</strong>
-            <small>Deterministic evaluation</small>
+            <span className="metric-label">REVIEW OUTCOMES</span>
+            <strong>4 support pathways</strong>
+            <small>Routine · Priority · Tutor review · More information</small>
           </div>
           <div className="overview-card">
-            <span className="metric-label">EVIDENCE</span>
-            <strong>Traceable</strong>
-            <small>Reasons and audit references</small>
+            <span className="metric-label">DECISION SUPPORT</span>
+            <strong>Human-led</strong>
+            <small>Recommendations supported by case evidence</small>
           </div>
         </section>
 
@@ -506,22 +576,56 @@ function App() {
                   ) : <p className="muted">No reasons returned.</p>}
                 </div>
 
-                <div className="result-section">
-                  <h4>Triggered rules</h4>
-                  <div className="tag-list">
-                    {recommendation?.triggered_rules?.length
-                      ? recommendation.triggered_rules.map((rule) => (
-                          <span className="rule-tag" key={rule}>{rule}</span>
-                        ))
-                      : <span className="muted">No rule identifiers returned.</span>}
-                  </div>
+                <div className="result-section evidence-section">
+                  <h4>Supporting evidence</h4>
+                  {recommendation?.evidence?.length ? (
+                    <ul className="evidence-list">
+                      {recommendation.evidence.map((item, index) => (
+                        <li key={`${item.source ?? 'evidence'}-${index}`}>
+                          {item.source && <strong>{getEvidenceSourceLabel(item.source, item.detail)}</strong>}
+                          {item.detail && <p>{getEvidenceDisplayDetail(item.source ?? '', item.detail)}</p>}
+                          {item.value !== undefined && item.value !== null && (
+                            <small>Recorded value: {getEvidenceDisplayValue(item.value)}</small>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="muted">No supporting evidence was returned for this recommendation.</p>
+                  )}
                 </div>
-              </>
+
+                <div className="result-section next-step-section">
+                  <h4>Suggested next step</h4>
+                  <p>{suggestedNextStep}</p>
+                  <small>Human review is required before taking action.</small>
+                </div></>
             )}
           </section>
         </div>
 
-        {result && (
+
+        {error && <div className="error-banner">Request error: {error}</div>}
+{showTechnicalReview && (
+            <section className="technical-workspace" id="technical-workspace" aria-label="Explainability and audit">
+              <div className="technical-workspace-heading">
+                <span className="section-kicker">ADVANCED REVIEW</span>
+                <h2>Explainability & Audit</h2>
+                <p>Inspect workflow execution, technical evidence and the audit record.</p>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => {
+                    setShowTechnicalReview(false)
+                    setActiveSection('case-prioritization')
+                  }}
+                >
+                  Close advanced review
+                </button>
+              </div>
+              {result ? (
+              <>
+
           <section className="panel context-panel">
             <div className="panel-heading">
               <div>
@@ -612,30 +716,18 @@ function App() {
                 </strong>
               </span>
             </div>
+            <div className="context-card">
+              <h3>Triggered rule identifiers</h3>
+              <div className="tag-list">
+                {recommendation?.triggered_rules?.length
+                  ? recommendation.triggered_rules.map((rule) => (
+                      <span className="rule-tag" key={rule}>{rule}</span>
+                    ))
+                  : <span className="muted">No rule identifiers returned.</span>}
+              </div>
+            </div>
           </section>
-        )}
-
-        {error && <div className="error-banner">Request error: {error}</div>}
-
-        {!result && (
-          <>
-            <section className="panel agents-panel" id="agent-workflow">
-              <span className="section-kicker">03 / EXECUTION TRACE</span>
-              <h2>Agent workflow</h2>
-              <p>Run a case to view the five-agent execution trace and each agent's results.</p>
-            </section>
-
-            <section className="panel audit-panel" id="audit-evidence">
-              <span className="section-kicker">05 / AUDITABILITY</span>
-              <h2>Audit evidence</h2>
-              <p>Run a case to generate an audit reference and retrieve its evidence record.</p>
-            </section>
-          </>
-        )}
-
-        {result && (
-          <>
-            <section className="panel agents-panel" id="agent-workflow">
+          <section className="panel agents-panel" id="agent-workflow">
               <div className="panel-heading">
                 <div>
                   <span className="section-kicker">03 / EXECUTION TRACE</span>
@@ -781,11 +873,20 @@ function App() {
                   : `${result.errors.length} workflow errors`}
               </span>
             </footer>
-          </>
-        )}
-
-        <footer className="page-footer">
-          AA004 · Student Support Case Prioritization · Phase 2.3 · Conditional LangGraph Orchestration
+              </>
+            ) : (
+              <section className="panel agents-panel">
+                <span className="section-kicker">ADVANCED REVIEW</span>
+                <h2>Technical details are not available yet</h2>
+                <p>
+                  Run a case in the Student Support workspace to generate
+                  its execution trace and audit evidence.
+                </p>
+              </section>
+            )}
+          </section>
+        )}<footer className="page-footer">
+          AA004 · Student Support Case Prioritization · Evidence-led support workspace
         </footer>
       </main>
     </div>
