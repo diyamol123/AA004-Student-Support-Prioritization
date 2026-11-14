@@ -1,6 +1,6 @@
 # AA004 — Student Support Case Prioritization
 
-**RealRails Agentic AI Batch 2 | Phase 3.1 — Productized Business Experience**
+**RealRails Agentic AI Batch 2 | Phase 3.2 — Final Demo & Portfolio Package**
 
 ## 1. Project Overview
 
@@ -340,13 +340,13 @@ Potential future enhancements include:
 **Case ID:** AA004
 **Product:** Student Support Case Prioritization
 **Domain:** Education Operations
-**Current implementation:** Phase 3.1 — Productized Business Experience
+**Current implementation:** Phase 3.2 — Final Demo & Portfolio Package
 
-### Phase 2.3 Production Deployment
+### Cloud Deployment
 
-The current cloud deployment runs the accepted Phase 2.3 — Controlled LLM Explanation implementation.
+The deployed application provides the Student Support Case Prioritization experience. Verify the live URLs before demonstration.
 
-- Frontend — Vercel: https://aa-004-student-support-prioritization-1zcj9gqb0-diyamol123.vercel.app/
+- Frontend — Vercel: https://aa-004-student-support-prioritizati.vercel.app/
 - Backend health — Render: https://aa004-student-support-prioritization.onrender.com/health
 
 The production deployment was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
@@ -355,4 +355,27 @@ The Render free instance may take time to wake after inactivity.
 
 ---
 
-**Current Status:** Phase 3.1 — Productized Business Experience implemented, tested, and accepted by the reviewer. The business-facing Student Support Workspace is complete, with the existing Phase 2 agentic AI architecture preserved. Approved to proceed to Post 3.2.
+**Current Status:** Phase 3.2 — Final Demo & Portfolio Package. The productized application is complete, production frontend and backend health endpoints have been verified, and 16 organised Phase 3.2 screenshots are included in the repository.
+
+
+## Phase 3.2 — Final Demo & Portfolio Package
+
+### Demo scenarios
+
+1. **Normal follow-up:** `DEMO-NORMAL-01` — expected `NORMAL_FOLLOWUP` via `LOW_RISK`.
+2. **Incomplete evidence:** `DEMO-INCOMPLETE-01` — expected `REQUEST_MORE_INFO` via `INCOMPLETE`.
+3. **Priority outreach and explanation:** `DEMO-PRIORITY-01` — expected `PRIORITY_OUTREACH` via `HIGH_SUPPORT_NEED`; Gemini explains the deterministic result without changing it.
+
+A conflicting-evidence scenario is also available: `DEMO-CONFLICT-01` — expected `TUTOR_REVIEW` via `CONFLICTING`.
+
+### Architecture evolution
+
+The project evolved from deterministic multi-agent prioritization, to sequential LangGraph orchestration, conditional routing, controlled Gemini explanations with deterministic fallback, and a business-facing workspace. Phase 3.2 packages the existing implementation for demonstration and review; it does not introduce a new decision engine.
+
+### Phase 3.2 screenshots
+
+Sixteen Phase 3.2 screenshots are organised as follows: `main-application/` (4), `scenario-1/` (4), `scenario-2/` (4), and `scenario-3/` (4). The original raw captures are kept separately in `evidence/phase-3.2/raw-captures/` and are not part of the organised screenshot submission. Earlier-phase screenshots remain in their original folders.
+
+### Demo limitations
+
+This is an academic-support MVP. Recommendations require human review. Thresholds are demo assumptions, audit records are held in backend memory and are lost after restart, and no live institutional integration is claimed. Gemini is an optional explanation layer and does not control decisions.
