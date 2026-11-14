@@ -285,7 +285,7 @@ npm run build
 npm run lint
 ```
 
-## 10. API Endpoints
+## 11. API Endpoints
 
 | Method | Endpoint | Purpose |
 |---|---|---|
@@ -293,7 +293,7 @@ npm run lint
 | POST | `/api/workflows/run` | Execute prioritization workflow |
 | GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
 
-## 11. Phase 2.2 Validation Results
+## 12. Phase 2.2 Validation Results
 
 Latest local validation:
 
@@ -308,7 +308,7 @@ Latest local validation:
 - Explanation and audit integration: verified
 - API workflow and audit integration: verified
 
-## 12. Submission Evidence
+## 13. Submission Evidence
 
 Phase 2.2 evidence is available in `evidence/phase-2.2/`. Phase 2.3 evidence is available in `evidence/phase-2.3/`.
 
@@ -316,7 +316,7 @@ See `evidence/phase-2.2/README.md` for the Phase 2.2 evidence inventory.
 
 See `evidence/phase-2.3/README.md` for the Phase 2.3 route explanation, screenshot inventory, validation results, and latest Repomix snapshot (`repomix-output.xml`).
 
-## 13. MVP Scope and Limitations
+## 14. MVP Scope and Limitations
 
 This MVP is designed for academic-support prioritization only.
 
@@ -326,7 +326,7 @@ This MVP is designed for academic-support prioritization only.
 - Recommendations support human academic-support staff and do not replace their judgment.
 - Audit records are currently held in backend memory and are not retained after a backend restart.
 
-## 14. Future Improvements
+## 15. Future Improvements
 
 Potential future enhancements include:
 
@@ -335,7 +335,7 @@ Potential future enhancements include:
 - Integration with approved student-support systems.
 - Further workflow orchestration capabilities.
 
-## 15. Project Information
+## 16. Project Information
 
 **Case ID:** AA004
 **Product:** Student Support Case Prioritization
@@ -346,7 +346,7 @@ Potential future enhancements include:
 
 The deployed application provides the Student Support Case Prioritization experience. Verify the live URLs before demonstration.
 
-- Frontend — Vercel: https://aa-004-student-support-prioritizati.vercel.app/
+- Frontend — Vercel: https://aa-004-student-support-prioritization-9rz26wc3j-diyamol123.vercel.app/
 - Backend health — Render: https://aa004-student-support-prioritization.onrender.com/health
 
 The production deployment was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
@@ -359,6 +359,13 @@ The Render free instance may take time to wake after inactivity.
 
 
 ## Phase 3.2 — Final Demo & Portfolio Package
+
+### Submission links
+
+- Organised Phase 3.2 screenshots: evidence/phase-3.2/screenshots/
+- Latest Phase 3.2 Repomix snapshot: evidence/phase-3.2/repomix-output.xml
+- GitHub repository: https://github.com/diyamol123/AA004-Student-Support-Prioritization
+- Live application: https://aa-004-student-support-prioritization-9rz26wc3j-diyamol123.vercel.app/
 
 ### Demo scenarios
 

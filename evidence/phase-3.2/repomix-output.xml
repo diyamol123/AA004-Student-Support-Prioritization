@@ -1,10 +1,10 @@
-This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
 
 <file_summary>
 This section contains a summary of this file.
 
 <purpose>
-This file contains a packed representation of the entire repository's contents.
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
 It is designed to be easily consumable by AI systems for analysis, code review,
 or other automated processes.
 </purpose>
@@ -32,6 +32,7 @@ The content is organized as follows:
 <notes>
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: evidence/phase-3.2/raw-captures/**, evidence/phase-3.2/screenshots/**
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
@@ -137,45 +138,6 @@ evidence/
       Screenshot 2026-11-13 at 19.03.50.png
       Screenshot 2026-11-13 at 19.03.57.png
       Screenshot 2026-11-13 at 19.06.42.png
-  phase-3.2/
-    raw-captures/
-      Screenshot 2026-11-14 at 10.34.51.png
-      Screenshot 2026-11-14 at 10.35.04.png
-      Screenshot 2026-11-14 at 10.35.14.png
-      Screenshot 2026-11-14 at 10.35.28.png
-      Screenshot 2026-11-14 at 10.35.49.png
-      Screenshot 2026-11-14 at 10.36.31.png
-      Screenshot 2026-11-14 at 10.36.40.png
-      Screenshot 2026-11-14 at 10.36.49.png
-      Screenshot 2026-11-14 at 10.37.13.png
-      Screenshot 2026-11-14 at 10.37.21.png
-      Screenshot 2026-11-14 at 10.37.28.png
-      Screenshot 2026-11-14 at 10.37.38.png
-      Screenshot 2026-11-14 at 10.38.00.png
-      Screenshot 2026-11-14 at 10.38.07.png
-      Screenshot 2026-11-14 at 10.38.17.png
-      Screenshot 2026-11-14 at 10.38.24.png
-    screenshots/
-      main-application/
-        01.png
-        02.png
-        03.png
-        04.png
-      scenario-1/
-        01.png
-        02.png
-        03.png
-        04.png
-      scenario-2/
-        01.png
-        02.png
-        03.png
-        04.png
-      scenario-3/
-        01.png
-        02.png
-        03.png
-        04.png
   01-Dashboard.png
   02-Successful-Workflow.png
   03-Audit-Evidence.png
@@ -6261,7 +6223,7 @@ npm run build
 npm run lint
 ```
 
-## 10. API Endpoints
+## 11. API Endpoints
 
 | Method | Endpoint | Purpose |
 |---|---|---|
@@ -6269,7 +6231,7 @@ npm run lint
 | POST | `/api/workflows/run` | Execute prioritization workflow |
 | GET | `/api/audit/{audit_reference}` | Retrieve workflow audit record |
 
-## 11. Phase 2.2 Validation Results
+## 12. Phase 2.2 Validation Results
 
 Latest local validation:
 
@@ -6284,7 +6246,7 @@ Latest local validation:
 - Explanation and audit integration: verified
 - API workflow and audit integration: verified
 
-## 12. Submission Evidence
+## 13. Submission Evidence
 
 Phase 2.2 evidence is available in `evidence/phase-2.2/`. Phase 2.3 evidence is available in `evidence/phase-2.3/`.
 
@@ -6292,7 +6254,7 @@ See `evidence/phase-2.2/README.md` for the Phase 2.2 evidence inventory.
 
 See `evidence/phase-2.3/README.md` for the Phase 2.3 route explanation, screenshot inventory, validation results, and latest Repomix snapshot (`repomix-output.xml`).
 
-## 13. MVP Scope and Limitations
+## 14. MVP Scope and Limitations
 
 This MVP is designed for academic-support prioritization only.
 
@@ -6302,7 +6264,7 @@ This MVP is designed for academic-support prioritization only.
 - Recommendations support human academic-support staff and do not replace their judgment.
 - Audit records are currently held in backend memory and are not retained after a backend restart.
 
-## 14. Future Improvements
+## 15. Future Improvements
 
 Potential future enhancements include:
 
@@ -6311,7 +6273,7 @@ Potential future enhancements include:
 - Integration with approved student-support systems.
 - Further workflow orchestration capabilities.
 
-## 15. Project Information
+## 16. Project Information
 
 **Case ID:** AA004
 **Product:** Student Support Case Prioritization
@@ -6322,7 +6284,7 @@ Potential future enhancements include:
 
 The deployed application provides the Student Support Case Prioritization experience. Verify the live URLs before demonstration.
 
-- Frontend — Vercel: https://aa-004-student-support-prioritizati.vercel.app/
+- Frontend — Vercel: https://aa-004-student-support-prioritization-9rz26wc3j-diyamol123.vercel.app/
 - Backend health — Render: https://aa004-student-support-prioritization.onrender.com/health
 
 The production deployment was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
@@ -6335,6 +6297,13 @@ The Render free instance may take time to wake after inactivity.
 
 
 ## Phase 3.2 — Final Demo & Portfolio Package
+
+### Submission links
+
+- Organised Phase 3.2 screenshots: evidence/phase-3.2/screenshots/
+- Latest Phase 3.2 Repomix snapshot: evidence/phase-3.2/repomix-output.xml
+- GitHub repository: https://github.com/diyamol123/AA004-Student-Support-Prioritization
+- Live application: https://aa-004-student-support-prioritization-9rz26wc3j-diyamol123.vercel.app/
 
 ### Demo scenarios
 
