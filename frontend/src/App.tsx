@@ -220,7 +220,7 @@ function App() {
     setAudit(null)
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/workflows/run`, {
+      const response = await fetch('/api/workflows/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(caseData),
@@ -252,7 +252,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || ''}/api/audit/${encodeURIComponent(result.audit_reference)}`,
+        `/api/audit/${encodeURIComponent(result.audit_reference)}`,
       )
       const data = await response.json()
 
