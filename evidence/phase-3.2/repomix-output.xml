@@ -6287,13 +6287,13 @@ The deployed application provides the Student Support Case Prioritization experi
 - Frontend — Vercel: https://aa-004-student-support-prioritization-9rz26wc3j-diyamol123.vercel.app/
 - Backend health — Render: https://aa004-student-support-prioritization.onrender.com/health
 
-The production deployment was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
+The deployed cloud application was verified with a successful Gemini explanation, valid structured output, and deterministic decision control.
 
 The Render free instance may take time to wake after inactivity.
 
 ---
 
-**Current Status:** Phase 3.2 — Final Demo & Portfolio Package. The productized application is complete, production frontend and backend health endpoints have been verified, and 16 organised Phase 3.2 screenshots are included in the repository.
+**Current Status:** Phase 3.2 — Final Demo & Portfolio Package. The productized application is complete, deployed Vercel frontend and Render backend health endpoints have been verified, and 16 organised Phase 3.2 screenshots are included in the repository.
 
 
 ## Phase 3.2 — Final Demo & Portfolio Package
@@ -6307,11 +6307,53 @@ The Render free instance may take time to wake after inactivity.
 
 ### Demo scenarios
 
-1. **Normal follow-up:** `DEMO-NORMAL-01` — expected `NORMAL_FOLLOWUP` via `LOW_RISK`.
-2. **Incomplete evidence:** `DEMO-INCOMPLETE-01` — expected `REQUEST_MORE_INFO` via `INCOMPLETE`.
-3. **Priority outreach and explanation:** `DEMO-PRIORITY-01` — expected `PRIORITY_OUTREACH` via `HIGH_SUPPORT_NEED`; Gemini explains the deterministic result without changing it.
+The following scenarios use the actual sample case IDs and input values defined in the application.
 
-A conflicting-evidence scenario is also available: `DEMO-CONFLICT-01` — expected `TUTOR_REVIEW` via `CONFLICTING`.
+| Scenario | Case ID | Attendance | Missed submissions | Engagement | Days since activity | Unresolved tickets | Expected route | Expected recommendation |
+|---|---|---:|---:|---|---:|---:|---|---|
+| Normal progress | `AA004-NORMAL-001` | 95 | 0 | `active` | 2 | 0 | `LOW_RISK` | `NORMAL_FOLLOWUP` |
+| Priority outreach | `AA004-CASE-001` | 68 | 3 | `inactive` | 18 | 2 | `HIGH_SUPPORT_NEED` | `PRIORITY_OUTREACH` |
+| Conflicting evidence | `AA004-CONFLICT-001` | 95 | 0 | `active` | 18 | 0 | `CONFLICTING` | `TUTOR_REVIEW` |
+| Incomplete information | `AA004-INCOMPLETE-001` | Missing | 1 | `unknown` | Missing | 0 | `INCOMPLETE` | `REQUEST_MORE_INFO` |
+
+The first three scenarios are the primary portfolio demonstration cases. Incomplete information is an additional scenario showing how the workflow handles missing evidence.
+
+### 2–3 minute demonstration flow
+
+1. **Problem and purpose (20 seconds):** Introduce the student-support problem and explain how the application organises student case evidence.
+2. **Load a case (20 seconds):** Select a sample scenario or enter its case details in the workspace.
+3. **Run the workflow (30 seconds):** Execute prioritisation and introduce the five agents: Case Intake, Attendance, Engagement, Support Load, and Student Support Decision.
+4. **Explain the result (30 seconds):** Show the final recommendation, route, score, and supporting evidence.
+5. **Show conditional handling (20 seconds):** Open the conflicting-evidence or incomplete-information scenario and explain why it follows a different route.
+6. **Explain the AI boundary (20 seconds):** Show that Gemini provides a controlled natural-language explanation while deterministic rules remain responsible for the recommendation. Mention the fallback behaviour.
+7. **Audit and close (20 seconds):** Open Explainability & Audit and conclude with the value of structured, reviewable student-support prioritisation.
+
+### Final README checklist
+
+- [ ] Project purpose, architecture, agents, and workflow match the implementation.
+- [ ] Scenario IDs and sample inputs match the application.
+- [ ] Expected routes and recommendations are documented.
+- [ ] Vercel frontend and Render backend URLs are correct.
+- [ ] Limitations and human-review requirements are stated.
+- [ ] No unsupported production-readiness claims are made.
+
+### Final demo checklist
+
+- [ ] Open the deployed application before the demonstration.
+- [ ] Confirm the backend health endpoint responds successfully.
+- [ ] Prepare the three primary sample scenarios.
+- [ ] Show the final recommendation and supporting evidence.
+- [ ] Show conditional routing and the explanation boundary.
+- [ ] Open Explainability & Audit.
+
+### Final portfolio checklist
+
+- [ ] Organised screenshots represent the current application.
+- [ ] Scenario screenshots correspond to the documented cases.
+- [ ] Repomix snapshot is regenerated after final README changes.
+- [ ] No secrets, API keys, or credentials are committed.
+- [ ] Repository and deployment links are accessible.
+- [ ] Academic MVP limitations are clearly documented.
 
 ### Architecture evolution
 
